@@ -130,6 +130,11 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                            skip_first_fm = stage1_dict['skip_first_fm'],
                            skip_first_or = stage1_dict['skip_first_or'],
                            verbose = stage1_dict['verbose'])
+        
+        # supply obs with new attributes if you can
+        if stage1_dict['location'] is not None:
+            obs.attrs['target_posx'] = stage1_dict['location'][0]
+            obs.attrs['target_posy'] = stage1_dict['location'][1]
 
         # create output directory
         output_dir = os.path.join(stage1_dict['toplevel_dir'],'outputs')
@@ -222,11 +227,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # refine location of the source in the direct image using COM fitting
         if stage1_dict['do_location']:
-            refine_location(obs, location=stage1_dict['location'], 
+            refine_location(obs,
                             verbose=stage1_dict['verbose'],
                             show_plots=stage1_dict['show_plots'],
                             save_plots=stage1_dict['save_plots'],
                             output_dir=run_dir)
+            # update the dict so that we can see this info in the output config
             stage1_dict['location'] = [obs.attrs['target_posx'],
                                        obs.attrs['target_posy']]
 
@@ -235,9 +241,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
             # FIX: The below hardcodes an adjustment to your guess that shifts it
             # from direct image pos to spec image. Hardcoding is something that we
             # want to avoid, so we need to think of a better way...
-            guess = [stage1_dict['location'][0]+100,
-                     stage1_dict['location'][1]+150]
-            track_0thOrder(obs, guess=guess,
+            track_0thOrder(obs, guess=[100,150],
                            verbose=stage1_dict['verbose'],
                            show_plots=stage1_dict['show_plots'],
                            save_plots=stage1_dict['save_plots'],
@@ -276,9 +280,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         stage2_dict = parse_config(stage2_config)
 
         # read the 'location' keyword from the Stage 0 config
+        # REDUNDANT: should have been done in stage 1
+        '''
         stage0_output_config = os.path.join(stage2_dict['toplevel_dir'],
                                             'outputs/stage0/stage_0_.hustle')
         stage0_output_dict = parse_config(stage0_output_config)
+        '''
 
         # read data
         S2_data_path = os.path.join(stage2_dict['toplevel_dir'],
@@ -287,6 +294,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # get the location from the obs.nc file
         stage2_dict['location'] = [obs.attrs['target_posx'], obs.attrs['target_posy']]
+        print(stage2_dict['location']) # FIX: this should NOT be the default, it should have been updated
 
         # create output directory
         output_dir = os.path.join(stage2_dict['toplevel_dir'],'outputs')
