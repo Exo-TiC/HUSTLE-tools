@@ -194,8 +194,8 @@ def plot_histogram(bin_cents, array, mode, median, exp_num,
         plt.axvline(gaussian_center, linestyle = '--', color = 'red', label='Gaussian center')
         plt.plot(bin_cents, gaussian_fit, color = 'gray')
 
-    plt.axvline(median, linestyle = '--', color = 'dodgerblue', label='Mode')
-    plt.axvline(mode, linestyle = '--', color = 'gold', label='Median')
+    plt.axvline(median, linestyle = '--', color = 'dodgerblue', label='Median')
+    plt.axvline(mode, linestyle = '--', color = 'gold', label='Mode')
     plt.xlabel('Pixel Value')
     plt.ylabel('Counts')
     plt.legend()
