@@ -16,6 +16,7 @@ from exotic_uvis.plotting import quicklookup
 from exotic_uvis.stage_0 import collect_and_move_files
 from exotic_uvis.stage_0 import get_files_from_mast
 from exotic_uvis.stage_0 import locate_target
+from exotic_uvis.stage_0 import check_spt_subarray
 
 from exotic_uvis.stage_1 import load_data_S1
 from exotic_uvis.stage_1 import save_data_S1
@@ -86,6 +87,9 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # locate target in direct image
         if stage0_dict['do_locate']:
+            # check for direct image / spec image discrepancies
+            xdiscs, ydiscs = check_spt_subarray(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_spt.fits'),
+                                                sorted(glob.glob(os.path.join(os.path.join(stage0_dict['toplevel_dir'],'specimages'),'*spt.fits'))))
             source_x, source_y = locate_target(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_flt.fits'))
             # modify config keyword
             stage0_dict['location'] = [source_x,source_y]
