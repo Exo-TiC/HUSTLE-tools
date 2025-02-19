@@ -44,7 +44,7 @@ class TestStage1(unittest.TestCase):
 
         config_path = os.path.join(cls.local_data_path, "G280_config")
         os.mkdir(config_path)
-        request.urlretrieve("https://www.stsci.edu/~WFC3/grism-resources/uvis-grism-sky-images/sky_G280_chip2_flt_hdr.fits",
+        request.urlretrieve("http://www.stsci.edu/~WFC3/grism-resources/uvis-grism-sky-images/G280sky_chip2_flt_v1.0.fits",
                             os.path.join(config_path,"Pagul_sky.fits"))
         cls.Pagul_path = os.path.join(config_path,"Pagul_sky.fits")
 
