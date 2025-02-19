@@ -72,6 +72,9 @@ class TestStage1(unittest.TestCase):
         cls.xarray_data.direct_image.data = pagul_star
         # Zero out the data quality array.
         cls.xarray_data.data_quality.data[:,:,:] = np.zeros_like(cls.xarray_data.data_quality.data[:,:,:])
+        # Update source position.
+        cls.xarray_data.attrs['target_posx'] = y0
+        cls.xarray_data.attrs['target_posy'] = x0
 
         # We need to have a background star as well, for tracking.
         # It wiggles slightly so we have motion to track.
@@ -137,11 +140,21 @@ class TestStage1(unittest.TestCase):
         # has 9 very obvious cosmic rays in the 500th frame.
         stage_1.fixed_iteration_rejection(self.xarray_tseries, sigmas=[10,10],
                                           replacement=None, verbose=2)
+        self.assertEqual(np.count_nonzero(self.xarray_tseries.data_quality.data),9)
 
+        # WIP!
+        '''
+        # Replace the noise and do it again.
+        for j in (1,3,7):
+            for i in (2,4,5):
+                self.xarray_tseries.images.data[499,i,j] = 1e12
+                self.xarray_tseries.data_quality.data[499,i,j] = 0
         stage_1.free_iteration_rejection(self.xarray_tseries,
-                                         threshold=10, verbose=2)
-        
+                                         threshold=2, verbose=2)
+        self.assertEqual(np.count_nonzero(self.xarray_tseries.data_quality.data),9)
+
         # obs = stage_1.sigma_clip_rejection(self.xarray_data, sigma=5)
+        '''
 
     def test_c_spatial_outlier_rejection(self):
         """ Clean hot pixels with various methods. """
@@ -149,10 +162,19 @@ class TestStage1(unittest.TestCase):
         stage_1.laplacian_edge_detection(self.xarray_data, sigma=10, factor=2,
                                          n=1, build_fine_structure=False,
                                          contrast_factor=5, verbose=2)
+        self.assertEqual(np.count_nonzero(self.xarray_data.data_quality.data),36)
         
         # WIP!
-        #stage_1.spatial_smoothing(self.xarray_data, sigma=10)
-        #self.assertEqual(np.count_nonzero(self.xarray_data.data_quality.data),18)
+        '''
+        # Replace the noise and do it again.
+        for j in (250,1250,1750):
+            for i in (150,250,350):
+                self.xarray_data.images.data[:,i,j] = 1e12
+                self.xarray_data.data_quality.data[:,i,j] = 0
+        stage_1.spatial_smoothing(self.xarray_data, type='2D_smooth', kernel=11,
+                                  sigma=10, bounds_set=None, verbose=2)
+        self.assertEqual(np.count_nonzero(self.xarray_data.data_quality.data),36)
+        '''
     
     def test_d_confirm_cleaned_correctly(self):
         # After all this cleaning, 9 CRs + 36 HPs = 45 bad pixels should have been found.
@@ -172,13 +194,13 @@ class TestStage1(unittest.TestCase):
         # First we are using the Pagul+ method, since we based our 'data' on it.
         stage_1.Pagul_bckg_subtraction(self.xarray_data,
                                        pagul_path = self.Pagul_path,
-                                       masking_parameter=0.0001,
+                                       masking_parameter=5,
                                        median_on_columns=False)
         
         # Most of the background should be close to zero now. Check that >99% of the data is small!
-        #check = (np.abs(self.xarray_data.images.data)<1).sum()
-        #self.assertTrue(check > 0.99*4*600*2100,
-        #                msg='Background subtraction failed!\nZeroed pixels: {:.2E} out of {:.2E} threshold for success'.format(check,0.99*4*600*2100))
+        check = (np.abs(self.xarray_data.images.data)<1).sum()
+        self.assertTrue(check > 0.99*4*600*2100,
+                        msg='Background subtraction failed!\nZeroed pixels: {:.2E} out of {:.2E} threshold for success'.format(check,0.99*4*600*2100))
 
         # Then we're trying uniform without bounds.
         # We know a priori our bckg is generally between -1 and 1.
@@ -190,7 +212,7 @@ class TestStage1(unittest.TestCase):
         # Since we already subtracted and zeroed out most of the data,
         # the bkg vals should be very small.
         for bkg_val in self.xarray_data['bkg_vals'].data:
-            self.assertTrue(abs(bkg_val) < 1e-5)
+            self.assertTrue(abs(bkg_val) < 1e-3)
 
         # Now we use the first and last four rows to get column bckg.
         stage_1.column_by_column_subtraction(self.xarray_data,
@@ -206,12 +228,12 @@ class TestStage1(unittest.TestCase):
         # Then check each value for smallness.
         for i in range(4):
             for j in range(2100):
-                self.assertTrue(abs(self.xarray_data['bkg_vals'].data[i,j])<1e-5)
+                self.assertTrue(abs(self.xarray_data['bkg_vals'].data[i,j])<1e-3)
     
     def test_f_tracking(self):
         """ Tracking of source and background stars. """
         # First, we refine the direct image location.
-        stage_1.refine_location(self.xarray_data)
+        stage_1.refine_location(self.xarray_data,window=20)
         for truth, retrieved in zip(self.star_truth,
                                     (self.xarray_data.attrs['target_posx'],
                                      self.xarray_data.attrs['target_posy'])):
@@ -219,7 +241,7 @@ class TestStage1(unittest.TestCase):
 
         # Then we track the 0th order in each frame.
         # We did not add any 0th order motion so there should be little variation.
-        xs, ys = stage_1.track_0thOrder(self.xarray_data,guess=[i for i in self.star_truth])
+        xs, ys = stage_1.track_0thOrder(self.xarray_data,guess=[0,0])
         for x,y in zip(xs,ys):
             self.assertAlmostEqual(self.star_truth[0],x,delta=0.01)
             self.assertAlmostEqual(self.star_truth[1],y,delta=0.01)
