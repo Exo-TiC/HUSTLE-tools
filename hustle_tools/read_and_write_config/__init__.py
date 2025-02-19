@@ -3,5 +3,5 @@ __all__ = [
     "write_config",
 ]
 
-from exotic_uvis.read_and_write_config.parser import parse_config
-from exotic_uvis.read_and_write_config.writer import write_config
+from hustle_tools.read_and_write_config.parser import parse_config
+from hustle_tools.read_and_write_config.writer import write_config

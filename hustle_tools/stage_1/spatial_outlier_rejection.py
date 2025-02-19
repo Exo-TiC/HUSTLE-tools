@@ -5,8 +5,8 @@ from scipy.ndimage import median_filter
 from scipy.signal import medfilt2d
 from astropy.stats import sigma_clip
 
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.stage_2 import spatial_profile_smooth
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.stage_2 import spatial_profile_smooth
 
 
 def spatial_smoothing(obs, type='1D_smooth', kernel=11, sigma=10, bounds_set=[[260, 370, 640, 1100],],

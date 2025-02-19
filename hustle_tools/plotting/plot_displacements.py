@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from exotic_uvis.plotting import plot_exposure
+from hustle_tools.plotting import plot_exposure
 
 
 #define plotting parameters
