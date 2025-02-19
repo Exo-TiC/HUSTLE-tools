@@ -3,16 +3,16 @@ import shutil
 import unittest
 from astroquery.mast import Observations
 
-from exotic_uvis import stage_0
+from hustle_tools import stage_0
 
 
 class TestStage0(unittest.TestCase):
-    """ Test exotic_uvis stage 0. """
+    """ Test hustle_tools stage 0. """
 
     @classmethod
     def setUpClass(cls):
         # Define local test path, and clear cached data.
-        cls.local_data_path = 'test_exotic_uvis_data'
+        cls.local_data_path = 'test_hustle_tools_data'
         if os.path.exists(cls.local_data_path):
             shutil.rmtree(cls.local_data_path)
 
