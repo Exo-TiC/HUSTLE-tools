@@ -2,14 +2,14 @@ from setuptools import setup
 
 
 setup(
-    name='exotic-uvis',
+    name='hustle-tools',
     version='0.0.1',
     author='Abby Boehm and Carlos Gascon',
-    url='https://github.com/Exo-TiC/ExoTiC-UVIS',
+    url='https://github.com/Exo-TiC/HUSTLE-tools',
     license='MIT',
-    packages=['exotic_uvis','exotic_uvis.read_and_write_config','exotic_uvis.plotting',
-              'exotic_uvis.stage_0','exotic_uvis.stage_1','exotic_uvis.stage_2',
-              'exotic_uvis.stage_3',],
+    packages=['hustle_tools','hustle_tools.read_and_write_config','hustle_tools.plotting',
+              'hustle_tools.stage_0','hustle_tools.stage_1','hustle_tools.stage_2',
+              'hustle_tools.stage_3',],
     description='HST UVIS reduction pipeline',
     long_description="Pipeline for analysis of Hubble Space Telescope "
                      "WFC3-UVIS G280 spectroscopic observations.",

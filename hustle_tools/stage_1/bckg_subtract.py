@@ -7,7 +7,7 @@ from scipy.optimize import least_squares
 from scipy.optimize import curve_fit
 from scipy.signal import medfilt, medfilt2d
 
-from exotic_uvis.plotting import plot_exposure, plot_corners, plot_bkgvals, plot_mode_v_params, plot_histogram
+from hustle_tools.plotting import plot_exposure, plot_corners, plot_bkgvals, plot_mode_v_params, plot_histogram
 
 
 def Pagul_bckg_subtraction(obs, pagul_path, masking_parameter=0.001,

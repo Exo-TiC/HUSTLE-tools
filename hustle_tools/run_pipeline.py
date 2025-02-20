@@ -3,52 +3,53 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
-from exotic_uvis.read_and_write_config import parse_config
-from exotic_uvis.read_and_write_config import write_config
+from hustle_tools.read_and_write_config import parse_config
+from hustle_tools.read_and_write_config import write_config
 
-from exotic_uvis.plotting import plot_one_spectrum
-from exotic_uvis.plotting import plot_spec_gif
-from exotic_uvis.plotting import plot_2d_spectra
-from exotic_uvis.plotting import plot_raw_whitelightcurve
-from exotic_uvis.plotting import plot_raw_spectrallightcurves
-from exotic_uvis.plotting import quicklookup
+from hustle_tools.plotting import plot_one_spectrum
+from hustle_tools.plotting import plot_spec_gif
+from hustle_tools.plotting import plot_2d_spectra
+from hustle_tools.plotting import plot_raw_whitelightcurve
+from hustle_tools.plotting import plot_raw_spectrallightcurves
+from hustle_tools.plotting import quicklookup
 
-from exotic_uvis.stage_0 import collect_and_move_files
-from exotic_uvis.stage_0 import get_files_from_mast
-from exotic_uvis.stage_0 import locate_target
+from hustle_tools.stage_0 import collect_and_move_files
+from hustle_tools.stage_0 import get_files_from_mast
+from hustle_tools.stage_0 import locate_target
+from hustle_tools.stage_0 import check_spt_subarray
 
-from exotic_uvis.stage_1 import load_data_S1
-from exotic_uvis.stage_1 import save_data_S1
-from exotic_uvis.stage_1 import uniform_value_bkg_subtraction
-from exotic_uvis.stage_1 import Pagul_bckg_subtraction
-from exotic_uvis.stage_1 import column_by_column_subtraction
-from exotic_uvis.stage_1 import track_bkgstars
-from exotic_uvis.stage_1 import track_0thOrder
-from exotic_uvis.stage_1 import free_iteration_rejection
-from exotic_uvis.stage_1 import fixed_iteration_rejection
-from exotic_uvis.stage_1 import laplacian_edge_detection
-from exotic_uvis.stage_1 import spatial_smoothing
-from exotic_uvis.stage_1 import refine_location
+from hustle_tools.stage_1 import load_data_S1
+from hustle_tools.stage_1 import save_data_S1
+from hustle_tools.stage_1 import uniform_value_bkg_subtraction
+from hustle_tools.stage_1 import Pagul_bckg_subtraction
+from hustle_tools.stage_1 import column_by_column_subtraction
+from hustle_tools.stage_1 import track_bkgstars
+from hustle_tools.stage_1 import track_0thOrder
+from hustle_tools.stage_1 import free_iteration_rejection
+from hustle_tools.stage_1 import fixed_iteration_rejection
+from hustle_tools.stage_1 import laplacian_edge_detection
+from hustle_tools.stage_1 import spatial_smoothing
+from hustle_tools.stage_1 import refine_location
 
-from exotic_uvis.stage_2 import load_data_S2
-from exotic_uvis.stage_2 import save_data_S2
-from exotic_uvis.stage_2 import get_calibration_0th
-from exotic_uvis.stage_2 import get_trace_solution
-from exotic_uvis.stage_2 import sens_correct
-from exotic_uvis.stage_2 import determine_ideal_halfwidth
-from exotic_uvis.stage_2 import standard_extraction
-from exotic_uvis.stage_2 import optimal_extraction
-from exotic_uvis.stage_2 import clean_spectra
-from exotic_uvis.stage_2 import align_spectra
-from exotic_uvis.stage_2 import align_profiles
-from exotic_uvis.stage_2 import remove_zeroth_order
+from hustle_tools.stage_2 import load_data_S2
+from hustle_tools.stage_2 import save_data_S2
+from hustle_tools.stage_2 import get_calibration_0th
+from hustle_tools.stage_2 import get_trace_solution
+from hustle_tools.stage_2 import sens_correct
+from hustle_tools.stage_2 import determine_ideal_halfwidth
+from hustle_tools.stage_2 import standard_extraction
+from hustle_tools.stage_2 import optimal_extraction
+from hustle_tools.stage_2 import clean_spectra
+from hustle_tools.stage_2 import align_spectra
+from hustle_tools.stage_2 import align_profiles
+from hustle_tools.stage_2 import remove_zeroth_order
 
-#from exotic_uvis.stage_3 import load_data_S3
-#from exotic_uvis.stage_3 import save_data_S3
+#from hustle_tools.stage_3 import load_data_S3
+#from hustle_tools.stage_3 import save_data_S3
 
 
 def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
-    """Wrapper for all Stages of the ExoTiC-UVIS pipeline.
+    """Wrapper for all Stages of the HUSTLE-tools pipeline.
 
     Args:
         config_files_dir (str): folder which contains the .hustle files needed
@@ -86,6 +87,9 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # locate target in direct image
         if stage0_dict['do_locate']:
+            # check for direct image / spec image discrepancies
+            xdiscs, ydiscs = check_spt_subarray(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_spt.fits'),
+                                                sorted(glob.glob(os.path.join(os.path.join(stage0_dict['toplevel_dir'],'specimages'),'*spt.fits'))))
             source_x, source_y = locate_target(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_flt.fits'))
             # modify config keyword
             stage0_dict['location'] = [source_x,source_y]
@@ -130,6 +134,11 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                            skip_first_fm = stage1_dict['skip_first_fm'],
                            skip_first_or = stage1_dict['skip_first_or'],
                            verbose = stage1_dict['verbose'])
+        
+        # supply obs with new attributes if you can
+        if stage1_dict['location'] is not None:
+            obs.attrs['target_posx'] = stage1_dict['location'][0]
+            obs.attrs['target_posy'] = stage1_dict['location'][1]
 
         # create output directory
         output_dir = os.path.join(stage1_dict['toplevel_dir'],'outputs')
@@ -222,11 +231,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # refine location of the source in the direct image using COM fitting
         if stage1_dict['do_location']:
-            refine_location(obs, location=stage1_dict['location'], 
+            refine_location(obs,
                             verbose=stage1_dict['verbose'],
                             show_plots=stage1_dict['show_plots'],
                             save_plots=stage1_dict['save_plots'],
                             output_dir=run_dir)
+            # update the dict so that we can see this info in the output config
             stage1_dict['location'] = [obs.attrs['target_posx'],
                                        obs.attrs['target_posy']]
 
@@ -235,9 +245,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
             # FIX: The below hardcodes an adjustment to your guess that shifts it
             # from direct image pos to spec image. Hardcoding is something that we
             # want to avoid, so we need to think of a better way...
-            guess = [stage1_dict['location'][0]+100,
-                     stage1_dict['location'][1]+150]
-            track_0thOrder(obs, guess=guess,
+            track_0thOrder(obs, guess=[100,150],
                            verbose=stage1_dict['verbose'],
                            show_plots=stage1_dict['show_plots'],
                            save_plots=stage1_dict['save_plots'],
@@ -276,9 +284,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         stage2_dict = parse_config(stage2_config)
 
         # read the 'location' keyword from the Stage 0 config
+        # REDUNDANT: should have been done in stage 1
+        '''
         stage0_output_config = os.path.join(stage2_dict['toplevel_dir'],
                                             'outputs/stage0/stage_0_.hustle')
         stage0_output_dict = parse_config(stage0_output_config)
+        '''
 
         # read data
         S2_data_path = os.path.join(stage2_dict['toplevel_dir'],
@@ -287,6 +298,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # get the location from the obs.nc file
         stage2_dict['location'] = [obs.attrs['target_posx'], obs.attrs['target_posy']]
+        print(stage2_dict['location']) # FIX: this should NOT be the default, it should have been updated
 
         # create output directory
         output_dir = os.path.join(stage2_dict['toplevel_dir'],'outputs')

@@ -6,7 +6,7 @@ def write_config(config_dict, run_name, stage, outdir):
 
     Args:
         config_dict (dict): dictionary used to guide the execution of a
-        Stage of ExoTiC-UVIS.
+        Stage of HUSTLE-tools.
         run_name (str): name of this run, used to give the config file
         a unique and identifiable name.
         stage (int): which Stage was executed, which sets the template
@@ -60,7 +60,7 @@ def Stage0_info():
         str, list, dict, dict: header and comments for writing the config.
     """
 
-    header = "# ExoTiC-UVIS config file for launching Stage 0: Data Handling"
+    header = "# HUSTLE-tools config file for launching Stage 0: Data Handling"
 
     subsection_headers = ["# Setup for Stage 0",
                           "# Step 1: Download files from MAST",
@@ -96,7 +96,7 @@ def Stage0_info():
                                      "# lst of str or None. File extensions you want to download. If None, take all file extensions. Otherwise, take only the files specified. _flt.fits, _spt.fits recommended as minimum working case.",],
                            "Step 2":["# Bool. Whether to perform this step.",
                                      "# The visit number you want to operate on.",
-                                     "# None or str. If you downloaded data in Step 1, leave this as None. If you have pre-downloaded data, please place all of it in filesfrom_dir. Don't sort it into sub-folders; ExoTiC-UVIS won't be able to find them if they are inside sub-folders!",],
+                                     "# None or str. If you downloaded data in Step 1, leave this as None. If you have pre-downloaded data, please place all of it in filesfrom_dir. Don't sort it into sub-folders; HUSTLE-tools won't be able to find them if they are inside sub-folders!",],
                            "Step 3":["# Bool. Whether to perform this step.",
                                      "# None or tuple of float. Prior to running Stage 0, this will be None. After running Stage 0, a copy of this .hustle file will be made with this information included.",],
                            "Step 4":["# Bool. Whether to perform this step.",],
@@ -111,7 +111,7 @@ def Stage1_info():
         str, list, dict, dict: header and comments for writing the config.
     """
     
-    header = "# ExoTiC-UVIS config file for launching Stage 1: Reduction"
+    header = "# HUSTLE-tools config file for launching Stage 1: Reduction"
 
     subsection_headers = ["# Setup for Stage 1",
                           "# Step 1: Read in the data",
@@ -235,7 +235,7 @@ def Stage2_info():
         str, list, dict, dict: header and comments for writing the config.
     """
 
-    header = "# ExoTiC-UVIS config file for launching Stage 2: Extraction"
+    header = "# HUSTLE-tools config file for launching Stage 2: Extraction"
 
     subsection_headers = ["# Setup for Stage 2",
                           "# Step 1: Read in the data",
@@ -303,7 +303,7 @@ def Stage3_info():
         str, list, dict, dict: header and comments for writing the config.
     """
 
-    header = "# ExoTiC-UVIS config file for launching Stage 3: Binning"
+    header = "# HUSTLE-tools config file for launching Stage 3: Binning"
 
     subsection_headers = ["# Setup for Stage 3",
                           "# Step 1: Read in the data",

@@ -7,9 +7,9 @@ from scipy import optimize
 from scipy.stats import linregress
 
 import grismconf
-from exotic_uvis.plotting import plot_profile_fit
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.plotting import plot_fitted_positions
+from hustle_tools.plotting import plot_profile_fit
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.plotting import plot_fitted_positions
 
 
 def get_calibration_0th(obs, source_pos, path_to_cal,

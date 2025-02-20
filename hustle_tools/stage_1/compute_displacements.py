@@ -3,18 +3,16 @@ from tqdm import tqdm
 import numpy as np
 from photutils.centroids import centroid_com
 
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.plotting import plot_bkg_stars, plot_0th_order
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.plotting import plot_bkg_stars, plot_0th_order
 
 
-def refine_location(obs, location=None, window=20,
+def refine_location(obs, window=20,
                     verbose=0, show_plots=0, save_plots=0, output_dir=None):
     """Function to refine the target location in the direct image
 
     Args:
         obs (xarray): obs.direct_image contains the direct image of the source.
-        location (list, optional): initial guess for the source location.
-        Defaults to None.
         window (int, optional): how far around the source to draw the window
         for centroiding. Defaults to 20.
         verbose (int, optional): how detailed you want the printed statements
@@ -34,12 +32,8 @@ def refine_location(obs, location=None, window=20,
     image = obs.direct_image.data.copy()
 
      # get estimated target location
-    if location:
-        x_loc = location[0]
-        y_loc = location[1]
-    else:
-        x_loc = obs.attrs['target_posx']
-        y_loc = obs.attrs['target_posy']
+    x_loc = obs.attrs['target_posx']
+    y_loc = obs.attrs['target_posy']
 
     # if true, calculate the centroid of a window around the initial guess
     if window:
@@ -154,7 +148,7 @@ def track_0thOrder(obs, guess,
 
     Args:
         obs (xarray): obs.images contains the images.
-        guess (lst of float): initial x, y position guess for the
+        guess (lst of float): initial x, y offset guess for the
         0th order's location.
         verbose (int, optional): how detailed you want the printed statements
         to be. Defaults to 0.
@@ -168,6 +162,9 @@ def track_0thOrder(obs, guess,
     Returns:
         lst of float: location of the direct image in x, y floats.
     """
+    # update guess to actual location
+    guess[0] += obs.attrs["target_posx"]
+    guess[1] += obs.attrs["target_posy"]
 
     # unpack guess and integerize it
     x0, y0 = [int(i) for i in guess]

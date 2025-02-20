@@ -2,7 +2,7 @@ from tqdm import tqdm
 
 import numpy as np
 
-from exotic_uvis.plotting import plot_exposure, plot_flags_per_time
+from hustle_tools.plotting import plot_exposure, plot_flags_per_time
 
 
 def fixed_iteration_rejection(obs, sigmas=[10,10], replacement=None,

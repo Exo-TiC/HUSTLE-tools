@@ -149,3 +149,64 @@ def locate_target(direct_image,test=False):
                         satisfied = True
     print("Source selected:", xs, ys)
     return xs, ys
+
+def check_spt_subarray(direct_spt,spec_spts):
+    """Checks the subarray corner info for the direct and spec spt files
+    and alerts the user to discrepancies.
+
+    Args:
+        direct_spt (str): Path to the direct spt.
+        spec_spts (list of str): Paths to the spec spts.
+
+    Returns:
+        list, list: Discrepancies in x and y between these values.
+    """
+    # Track discrepancies.
+    xdiscs, ydiscs = [], []
+
+    # First, crack open the direct image and check its corners.
+    with fits.open(direct_spt) as fits_file:
+        # Retrieve the direct image subarray info.
+        x0 = fits_file[0].header['SS_A1CRN']
+        y0 = fits_file[0].header['SS_A2CRN']
+    
+    # Then, check for mismatches.
+    for spec_spt in spec_spts:
+        with fits.open(spec_spt) as fits_file:
+            # Retrieve the spec image subarray info.
+            xs = fits_file[0].header['SS_A1CRN']
+            ys = fits_file[0].header['SS_A2CRN']
+        xdiscs.append(x0-xs)
+        ydiscs.append(y0-ys)
+    
+    # Report discrepancies in general.
+    if any([i!=0 for i in xdiscs+ydiscs]):
+        print("Discrepancies detected between direct image and spec image subarrays!\nPlease review your APT file for possible errors.")
+        print("When locating your target in the direct image, override the automatically-determined source position and apply a correction based on the values reported here. This will ensure proper wavelength solution.")
+    
+    # Report discrepancies in x.
+    if any([i!=0 for i in xdiscs]):
+        print("x corner discrepancies found.")
+        print("Number of discrepant spec files: {} out of {}".format(len([i for i in xdiscs if i != 0]),
+                                                                     len(spec_spts)))
+        if all([i==np.mean(i) for i in xdiscs]):
+            print("Offset to apply to x: {}".format(xdiscs[0]))
+        else:
+            print("Variable discrepancies detected! The discrepancies are:")
+            for i, x in enumerate(xdiscs):
+                print(i, x)
+
+    # Report discrepancies in y.
+    if any([i!=0 for i in ydiscs]):
+        print("y corner discrepancies found.")
+        print("Number of discrepant spec files: {} out of {}".format(len([i for i in ydiscs if i != 0]),
+                                                                     len(spec_spts)))
+        if all([i==np.mean(i) for i in ydiscs]):
+            print("Offset to apply to y: {}".format(ydiscs[0]))
+        else:
+            print("Variable discrepancies detected! The discrepancies are:")
+            for i, y in enumerate(ydiscs):
+                print(i, y)
+    
+    # Return the discrepancy information.
+    return xdiscs, ydiscs

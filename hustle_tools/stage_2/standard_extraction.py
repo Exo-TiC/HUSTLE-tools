@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
 
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.plotting import plot_aperture_lightcurves
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.plotting import plot_aperture_lightcurves
 
 
 def standard_extraction(obs, halfwidth, trace_x, trace_y, order='+1', masks = [],
