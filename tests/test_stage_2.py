@@ -8,15 +8,15 @@ import numpy as np
 from scipy.signal import medfilt2d
 import xarray as xr
 
-from exotic_uvis import stage_0, stage_1, stage_2
+from hustle_tools import stage_0, stage_1, stage_2
 
 class TestStage2(unittest.TestCase):
-    """ Test exotic_uvis stage 2. """
+    """ Test hustle_tools stage 2. """
 
     @classmethod
     def setUpClass(cls):
         # Define local test path, and clear cached data.
-        cls.local_data_path = 'test_exotic_uvis_data'
+        cls.local_data_path = 'test_hustle_tools_data'
         if os.path.exists(cls.local_data_path):
             shutil.rmtree(cls.local_data_path)
 

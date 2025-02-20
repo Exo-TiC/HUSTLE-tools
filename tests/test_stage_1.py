@@ -7,15 +7,15 @@ from astropy.io import fits
 import numpy as np
 import xarray as xr
 
-from exotic_uvis import stage_0, stage_1
+from hustle_tools import stage_0, stage_1
 
 class TestStage1(unittest.TestCase):
-    """ Test exotic_uvis stage 1. """
+    """ Test hustle_tools stage 1. """
 
     @classmethod
     def setUpClass(cls):
         # Define local test path, and clear cached data.
-        cls.local_data_path = 'test_exotic_uvis_data'
+        cls.local_data_path = 'test_hustle_tools_data'
         if os.path.exists(cls.local_data_path):
             shutil.rmtree(cls.local_data_path)
 
