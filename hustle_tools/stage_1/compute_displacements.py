@@ -3,8 +3,8 @@ from tqdm import tqdm
 import numpy as np
 from photutils.centroids import centroid_com
 
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.plotting import plot_bkg_stars, plot_0th_order
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.plotting import plot_bkg_stars, plot_0th_order
 
 
 def refine_location(obs, window=20,

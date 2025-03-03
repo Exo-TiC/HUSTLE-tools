@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy.signal import medfilt
 
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.stage_2 import standard_extraction
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.stage_2 import standard_extraction
 
 
 def spatial_profile_curved():

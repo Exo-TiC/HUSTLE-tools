@@ -13,7 +13,7 @@ plt.rc('axes', labelsize=14)
 plt.rc('legend',**{'fontsize':11})
 
 
-from exotic_uvis.plotting import plot_exposure
+from hustle_tools.plotting import plot_exposure
 
 
 def Gauss1D(x, A, x0, sigma):
