@@ -1,4 +1,4 @@
-# ExoTiC-UVIS config file for launching Stage 2: Extraction
+# HUSTLE-tools config file for launching Stage 2: Extraction
 
 # Setup for Stage 2
 toplevel_dir    './files'                                   # Directory where your current project files are stored. This folder should contain the specimages/, directimages/, etc. folders with your data as well as the outputs folder.

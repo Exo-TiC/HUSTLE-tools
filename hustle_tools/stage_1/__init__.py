@@ -15,10 +15,10 @@ __all__ = [
 ]
 
 
-from exotic_uvis.stage_1.load_and_save_data import load_data_S1
-from exotic_uvis.stage_1.load_and_save_data import save_data_S1
-from exotic_uvis.stage_1.spatial_outlier_rejection import laplacian_edge_detection, spatial_smoothing
-from exotic_uvis.stage_1.bckg_subtract import Pagul_bckg_subtraction, uniform_value_bkg_subtraction, column_by_column_subtraction
-from exotic_uvis.stage_1.temporal_outlier_rejection import fixed_iteration_rejection, free_iteration_rejection
-from exotic_uvis.stage_1.compute_displacements import track_bkgstars, track_0thOrder, refine_location
-from exotic_uvis.plotting.plot_exposures import plot_exposure
+from hustle_tools.stage_1.load_and_save_data import load_data_S1
+from hustle_tools.stage_1.load_and_save_data import save_data_S1
+from hustle_tools.stage_1.spatial_outlier_rejection import laplacian_edge_detection, spatial_smoothing
+from hustle_tools.stage_1.bckg_subtract import Pagul_bckg_subtraction, uniform_value_bkg_subtraction, column_by_column_subtraction
+from hustle_tools.stage_1.temporal_outlier_rejection import fixed_iteration_rejection, free_iteration_rejection
+from hustle_tools.stage_1.compute_displacements import track_bkgstars, track_0thOrder, refine_location
+from hustle_tools.plotting.plot_exposures import plot_exposure

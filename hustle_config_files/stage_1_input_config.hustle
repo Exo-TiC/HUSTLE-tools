@@ -1,4 +1,4 @@
-# ExoTiC-UVIS config file for launching Stage 1: Reduction
+# HUSTLE-tools config file for launching Stage 1: Reduction
 
 # Setup for Stage 1
 toplevel_dir    './files'                                   # Directory where your Stage 0 files are stored. This folder should contain the specimages/, directimages/, etc. folders with your data.
