@@ -1,6 +1,5 @@
 import numpy as np
 from astropy.io import fits
-from wfc3tools import sub2full
 import matplotlib.pyplot as plt
 import xarray as xr
 from tqdm import tqdm
