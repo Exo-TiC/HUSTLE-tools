@@ -476,6 +476,8 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         # read data, one order at a time
         S3_data_path = os.path.join(stage3_dict['toplevel_dir'],
                                     os.path.join('outputs',stage3_dict['input_run']))
+        
+        print('hello')
 
         #for order in stage3_dict['orders']:
             # load the spectrum for this order
