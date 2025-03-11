@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib.pylab as pl
 
 
 #define plotting parameters
@@ -247,3 +248,124 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
     plt.close() # save memory
 
     return
+
+
+def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, save_plot = False,
+                              filename = None, output_dir = None):
+    
+    times = light_curves.exp_time.data
+    spec_lcs = light_curves.spec_lc.data
+    spec_lcs_err = light_curves.spec_lc.data
+    wave_edges = light_curves.wave_edges.data
+
+
+
+    # make this an animation
+    for i, lc in enumerate(spec_lcs):
+
+        plt.figure(figsize = (10, 7))
+        plt.plot(times, lc, 'o', color='indianred', markeredgecolor='black')
+        plt.xlabel('Time of exposure')
+        plt.ylabel('Counts')
+        plt.title("{} order spectral light curve []".format(order))
+
+        if save_plot:
+            plot_dir = os.path.join(output_dir, 'plots') 
+            if not os.path.exists(plot_dir):
+                os.makedirs(plot_dir) 
+            filedir = os.path.join(plot_dir, f'{filename}_lc{i}.png')
+            #plt.savefig(filedir,dpi=300,bbox_inches='tight')
+
+        if show_plot:
+            plt.show(block=True)
+
+        plt.close() # save memory
+
+    return 
+
+def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
+                   filename=None, output_dir = None):
+    """_summary_
+
+    Args:
+        light_curves (_type_): _description_
+        order (_type_): _description_
+        show_plot (bool, optional): _description_. Defaults to False.
+        save_plot (bool, optional): _description_. Defaults to False.
+        filename (_type_, optional): _description_. Defaults to None.
+        output_dir (_type_, optional): _description_. Defaults to None.
+    """
+
+    # import data
+    exp_time = light_curves.exp_time.data
+    wave_cents = light_curves.wave_cents.data
+    wave_edges = light_curves.wave_edges.data
+    lcs_raw = light_curves.spec_lc.data
+    
+    # define colors and offsets
+    colors = pl.cm.jet(np.linspace(0, 1, len(wave_cents)))
+    offset = -0.02 # find a way to calculate this automatically
+
+    # get index cut
+    half_ind = int(np.shape(lcs_raw)[0]/2)
+  
+    # create figure
+    plt.figure(figsize = (8, 35))
+    plt.title(f'Raw binned light curves order {order}')
+    ax1 = plt.subplot2grid((1, 2), (0, 0))
+
+    for i, lc in enumerate(lcs_raw[:half_ind]):
+
+        ax1.plot(exp_time, lc/np.mean(lc) + i*offset, 
+                 '--', color = colors[i], markersize=3, linewidth=1)
+        
+        ax1.plot(exp_time, lc/np.mean(lc) + i*offset, 
+                 'o', color = colors[i], markersize=3, markeredgecolor = 'black', markeredgewidth = 0.5)
+        
+        ax1.text(exp_time[0], 1 + i*offset - offset/2, 
+                 '[{:.0f}, {:.0f}] $\AA$'.format(wave_edges[i], wave_edges[i+1]), 
+                 color = colors[i], 
+                 fontsize = 8, 
+                 fontweight='bold')
+
+         
+    ax1.set_ylabel('Normalized Flux')
+    ax1.set_xlabel('Time from Mid-transit (days)')
+    #ax1.set_ylim(ylims)
+
+    ax2 = plt.subplot2grid((1, 2), (0, 1), sharey = None, sharex = ax1)
+
+    for i, lc in enumerate(lcs_raw[half_ind:]):
+
+        ax2.plot(exp_time, lc/np.mean(lc) + i*offset, 
+                 '--', color = colors[half_ind + i], markersize=3, linewidth=1)
+        
+        ax2.plot(exp_time, lc/np.mean(lc) + i*offset, 
+                 'o', color = colors[half_ind + i], markersize=3, markeredgecolor = 'black', markeredgewidth = 0.5)
+        
+        ax2.text(exp_time[0], 1 + i*offset - offset/2, 
+                 '[{:.0f}, {:.0f}] $\AA$'.format(wave_edges[half_ind + i], wave_edges[half_ind + i + 1]), 
+                 color = colors[half_ind + i], 
+                 fontsize = 8, 
+                 fontweight='bold')
+     
+    plt.subplots_adjust(wspace=0.05, hspace=0.1)
+
+    ax2.set_xlabel('Time from Mid-transit (days)')
+    ax2.set_yticks([])
+
+
+    if save_plot:
+        plot_dir = os.path.join(output_dir, 'plots') 
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir) 
+        filedir = os.path.join(plot_dir, f'{filename}_order{order}.png')
+        plt.savefig(filedir, dpi=300, bbox_inches='tight')
+
+    if show_plot:
+        plt.show(block=True)
+
+    plt.close() # save memory
+
+
+    return 
