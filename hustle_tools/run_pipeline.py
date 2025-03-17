@@ -49,6 +49,7 @@ from hustle_tools.stage_2 import remove_zeroth_order
 from hustle_tools.stage_3 import load_data_S3
 from hustle_tools.stage_3 import save_data_S3
 from hustle_tools.stage_3 import bin_light_curves
+from hustle_tools.stage_3 import get_state_vectors
 
 
 def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
@@ -472,8 +473,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
     ####### Run Stage 3 #######
     if 3 in stages:
-
-        print('Running stage 3')
         
         # read out the stage 3 config
         stage3_config = glob.glob(os.path.join(config_files_dir,'stage_3*'))[0]
@@ -501,7 +500,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                             rem_exp = None)
 
             # get jitter vectors 
-            # read_vectors()
+            state_vectors = get_state_vectors(specs, plot=(stage3_dict['show_plots'] > 0))
 
             # do plotting
             if (stage3_dict['show_plots'] > 0 or stage3_dict['save_plots'] > 0):

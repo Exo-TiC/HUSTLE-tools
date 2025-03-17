@@ -11,30 +11,6 @@ import time
 import os
 
 
-def correct_vects(exp_times, vect):
-
-
-    off1 = vect[26] - vect[25]
-    off2 = 0
-    off3 = 0
-    
-    #coeffs = np.polyfit(exp_times[-8:-1], vect[-8:-1], deg = 6)
-    #extrapol = np.polyval(coeffs, exp_times[-1])
-    
-    vect_corr = vect.copy()
-    vect_corr[-1] = vect[-2] + off1
-
-    plt.figure(figsize = (10, 7))
-    plt.scatter(exp_times, vect)
-    #plt.plot(exp_times[-8:], np.polyval(coeffs, exp_times[-8:]))
-    plt.scatter(exp_times[-1], vect_corr[-1])
-    plt.show()
-
-
-    return [vect_corr]
-
-
-
 def draw_ephemeris(ephemeris, period):
 
     """
@@ -74,10 +50,15 @@ def normalize(vects):
     Function to normalize a set of arrays
     
     """
+    if len(np.shape(vects)) > 1:
+        medians = np.median(vects, axis = 1)[:, np.newaxis]
+        stds = np.std(vects, axis = 1)[:, np.newaxis]
+        state_vects = (vects - medians)/stds
+    else:
+        median = np.median(vects)
+        std = np.std(vects)
+        state_vects = (vects - median)/std
 
-    medians = np.median(vects, axis = 1)[:, np.newaxis]
-    stds = np.std(vects, axis = 1)[:, np.newaxis]
-    state_vects = (vects - medians)/stds
 
     return state_vects
 
@@ -129,7 +110,7 @@ def get_jitter_data(data_dir, res):
 
 
 
-def get_state_vects(res, data_dir = None, method = 'jit_dec', include = 'all', plot = False):
+def get_state_vectors(res, data_dir = None, method = 'jit_dec', include_jitter = False, plot = False):
 
     """
     
@@ -144,77 +125,55 @@ def get_state_vects(res, data_dir = None, method = 'jit_dec', include = 'all', p
     hst_phase = ((res.exp_time.data + phase_offset) % HST_orbit) / HST_orbit
 
     # import image parameters
-    #widths = np.mean(res.fit_widths.data * res.spec.data, axis = 1)
-    widths = np.mean(res.fit_widths.data, axis = 1)
+    #widths = np.mean(res.fit_widths.data, axis = 1)
     bkg_star_x = res.meanstar_disp.data[:, 0]
     bkg_star_y = res.meanstar_disp.data[:, 1]
-    spec_disp = res.spec_disp.data #is this correctly flipped?
+    spec_disp = res.spec_disp.data 
     prof_disp = np.median(res.prof_disp.data, axis = 1)
 
     # get jitter vectors
-    jitter_vects, jitter_names = get_jitter_data(data_dir, res)
-
-    # basic vectors
-    emp_vects = np.array([res.exp_time.data,
-                          hst_phase,
-                          spec_disp])
-    vect_names = ['Time', 'HST phase', 'Wave shift']
-    
+    #jitter_vects, jitter_names = get_jitter_data(data_dir, res)
 
     # if true, include jitter decorrelation vevtors
-    if method == 'jit_dec':
+    #if include_jitter:
+    #    for var in include:
+    #        ind = np.where(jitter_names == var)
+    #        jit_vect = jitter_vects[ind]
+            #jit_vect = correct_vects(res.exp_time.data, jit_vect.flatten())
+    #        extra_vects = np.concatenate((extra_vects, jit_vect))
+    #        vect_names.append(var)
 
-        if include == 'all':
-            extra_vects = np.array([
-                            widths,
-                            bkg_star_x,
-                            bkg_star_y])
-            extra_vects = np.concatenate((extra_vects, jitter_vects))
+    # create xarray with data:
+    state_vectors = xr.Dataset(
+            data_vars=dict(
+                times = (['exp_time'], normalize(res.exp_time.data)),
+                phase = (['exp_time'], normalize(hst_phase)),
+                phase2 = (['exp_time'], normalize(hst_phase**2)),
+                phase3 = (['exp_time'], normalize(hst_phase**3)),
+                phase4 = (['exp_time'], normalize(hst_phase**4)),
+                bkg_star_x = (['exp_time'], normalize(bkg_star_x)),
+                bkg_star_y = (['exp_time'], normalize(bkg_star_y)),
+                spec_disp = (['exp_time'], normalize(spec_disp)),
+                prof_disp = (['exp_time'], normalize(prof_disp)),
 
-        else:
-            extra_vects = np.array([
-                            hst_phase**2,
-                            hst_phase**3,
-                            hst_phase**4,
-                            widths,
-                            #bkg_star_x,
-                            #bkg_star_y,
-                            prof_disp,
-                            ])
-            vect_names.extend(['HST phase**2', 'HST phase**3', 'HST phase**4', 'Prof widths', 'Prof shifts'])
+                ),
+            coords=dict(
+                exp_time = res.exp_time.data,
+        ),
+        #attrs = dict(ref_time=ref_time),
+    ) 
 
-            for var in include:
-                ind = np.where(jitter_names == var)
-                jit_vect = jitter_vects[ind]
-                #jit_vect = correct_vects(res.exp_time.data, jit_vect.flatten())
-                extra_vects = np.concatenate((extra_vects, jit_vect))
-                vect_names.append(var)
-        
-
-
-    elif method == 'sys_marg':
-        extra_vects = np.array([
-                        hst_phase**2,
-                        hst_phase**3,
-                        hst_phase**4,
-                        widths, 
-                        bkg_star_x,
-                        bkg_star_y, 
-                        prof_disp])  
-
-
-    all_vects = np.concatenate((emp_vects, extra_vects))
-    state_vects = normalize(all_vects)
-
-    
     if plot:
         # plot main detrending vectors:
         plt.figure(figsize = (15, 12))
-        for i, state_vect in enumerate(state_vects):
-            #state_vects[8 + i, -1] = np.median(state_vect)
-            if i < 16:
-                ax = plt.subplot(4, 4, i + 1)
-                ax.scatter(res.exp_time.data, state_vect)
-        plt.show()
+        i = 0
+        for varname, vect in state_vectors.data_vars.items():
+            ax = plt.subplot(3, 3, i + 1)
+            ax.plot(res.exp_time.data, vect, 'o', color='indianred', markeredgecolor='black')
+            ax.set_title(varname)
+            i += 1
+        plt.show(block=True)
 
-    return state_vects, vect_names
+
+
+    return state_vectors
