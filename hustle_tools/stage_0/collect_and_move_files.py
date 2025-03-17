@@ -24,7 +24,7 @@ def collect_and_move_files(visit_number, fromdir, outdir, verbose=2):
         os.makedirs(outdir)
     
     # Collect and sort files from the fromdir that are in the right visit.
-    spec_flt, spec_spt, direct_flt, direct_spt, misc_files = collect_files(fromdir, visit_number, verbose)
+    spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_files = collect_files(fromdir, visit_number, verbose)
 
     # Then sort by orbit.
     identify_orbits(spec_flt, spec_spt, direct_flt, direct_spt, misc_files, verbose)
@@ -199,6 +199,8 @@ def collect_files(search_dir, visit_number, verbose=2):
     # Direct image files using F filters, split by flt and spt
     direct_flt = []
     direct_spt = []
+    # Jitter files, one per orbit
+    jit_files = []
     # Files that did not fit into any other category
     misc_files = []
 
@@ -250,9 +252,12 @@ def collect_files(search_dir, visit_number, verbose=2):
                 else:
                     # Unrecognized filter
                     misc_files.append(f)
+            elif "jit.fits" in f:
+                # jit files contain the jitter information for decorrelation
+                jit_files.append(f)
             else:
                 # Unrecognizd file type
                 misc_files.append(f)
     if verbose >= 1:
-        print("Collected spec, direct, and misc files.")
-    return spec_flt, spec_spt, direct_flt, direct_spt, misc_files
+        print("Collected spec, direct, jitter, and misc files.")
+    return spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_files
