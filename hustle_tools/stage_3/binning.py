@@ -43,6 +43,10 @@ def get_speclcs(specs, specs_err, waves, bins, norm_lim = 8):
     for i in range(len(wave_cents)):
 
         mask = (waves >= wave_edges[i]) & (waves < wave_edges[i + 1]) # do this more accurately
+        if not np.any(mask==True):
+            # The entire mask is false, so must pass and delete this wave cent.
+            wave_cents = np.delete(wave_cents,i)
+            continue
 
         wave_edges_acc.append(waves_mid[np.where(mask == True)[0][-1] + 1])
     

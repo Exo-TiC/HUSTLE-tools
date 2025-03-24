@@ -520,6 +520,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                                     output_dir=run_dir)
 
             # save light cuves
-            save_data_S3(light_curves, output_dir=run_dir)
+            save_data_S3(light_curves, output_dir=run_dir, order=order)
 
             
