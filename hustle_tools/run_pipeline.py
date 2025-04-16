@@ -11,7 +11,9 @@ from hustle_tools.plotting import plot_spec_gif
 from hustle_tools.plotting import plot_2d_spectra
 from hustle_tools.plotting import plot_raw_whitelightcurve
 from hustle_tools.plotting import plot_raw_spectrallightcurves
+from hustle_tools.plotting import plot_raw_binned_spectrallightcurves
 from hustle_tools.plotting import quicklookup
+from hustle_tools.plotting import plot_waterfall
 
 from hustle_tools.stage_0 import collect_and_move_files
 from hustle_tools.stage_0 import get_files_from_mast
@@ -44,8 +46,11 @@ from hustle_tools.stage_2 import align_spectra
 from hustle_tools.stage_2 import align_profiles
 from hustle_tools.stage_2 import remove_zeroth_order
 
-#from hustle_tools.stage_3 import load_data_S3
-#from hustle_tools.stage_3 import save_data_S3
+from hustle_tools.stage_3 import load_data_S3
+from hustle_tools.stage_3 import save_data_S3
+from hustle_tools.stage_3 import bin_light_curves
+from hustle_tools.stage_3 import get_state_vectors
+
 
 
 def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
@@ -469,16 +474,54 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
     ####### Run Stage 3 #######
     if 3 in stages:
+      
         # read out the stage 3 config
         stage3_config = glob.glob(os.path.join(config_files_dir,'stage_3*'))[0]
         stage3_dict = parse_config(stage3_config)
 
         # read data, one order at a time
         S3_data_path = os.path.join(stage3_dict['toplevel_dir'],
-                                    os.path.join('outputs',stage3_dict['input_run']))
+                            os.path.join('outputs/stage2',stage3_dict['input_run']))
+        
+        # create output directory
+        output_dir = os.path.join(stage3_dict['toplevel_dir'],'outputs')
+        stage_dir = os.path.join(output_dir,'stage3')
+        run_dir = os.path.join(stage_dir,stage3_dict['output_run'])
 
-        #for order in stage3_dict['orders']:
+        for order in stage3_dict['orders']:
             # load the spectrum for this order
-            #spex = load_data_S3(S3_data_path, order=order, verbose = stage3_dict['verbose'])
+            specs = load_data_S3(S3_data_path, order=order, verbose = stage3_dict['verbose'])
+
+            # run binning
+            #need to get how many exp per orbit for norm_lim
+            light_curves = bin_light_curves(specs, 
+                                            order, 
+                                            bins = stage3_dict['wavelength_bins'], 
+                                            norm_lim = 7, 
+                                            rem_exp = None)
+
+            # get jitter vectors 
+            state_vectors = get_state_vectors(specs, plot=(stage3_dict['show_plots'] > 0))
+
+            # do plotting
+            if (stage3_dict['show_plots'] > 0 or stage3_dict['save_plots'] > 0):
+
+                plot_waterfall(light_curves, 
+                               order=order, 
+                               show_plot=(stage3_dict['show_plots'] > 0),
+                               save_plot=(stage3_dict['save_plots'] > 0),
+                               filename=f'waterfall_order{order}',
+                               output_dir=run_dir)
+                
+                plot_raw_binned_spectrallightcurves(light_curves, 
+                                                    order=order, 
+                                                    show_plot=(stage3_dict['show_plots'] > 0),
+                                                    save_plot=(stage3_dict['save_plots'] > 0),
+                                                    filename=f'raw',
+                                                    output_dir=run_dir)
+
+            # save light cuves
+            save_data_S3(light_curves, output_dir=run_dir, order=order)
+
 
             

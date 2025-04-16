@@ -61,6 +61,7 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
 
                 # pry orbit number out of filename
                 orbit_N = float(filename[2:4])
+
                 
                 # append data
                 images.append(image) 
@@ -68,6 +69,7 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
                 read_noise.append(np.median(np.sqrt(error**2 - image))) 
                 subarr_coords.append(np.array([y1,y2,x1,x2]))
                 orbit_Ns.append(orbit_N)
+
 
     # collapse subarr_coords
     subarr_coords = np.mean(np.array(subarr_coords),axis=0)
@@ -94,6 +96,7 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
             errors=(["exp_time", "x", "y"], errors),
             subarr_coords=(["index"],subarr_coords),
             orbit_numbers=(["exp_time"],orbit_Ns),
+
             direct_image = (["x", "y"], direct_image),
             badpix_mask = (["exp_time", "x", "y"], np.ones_like(images, dtype = 'bool')),
             data_quality = (["exp_time", "x", "y"], data_quality),

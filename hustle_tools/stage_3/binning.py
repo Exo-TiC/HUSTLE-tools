@@ -1,46 +1,124 @@
 import numpy as np
+import xarray as xr
 
-def bin_light_curves(oneDspec, oneDerr, wave, time, order="+1",
-                     reject_bad_cols=True, bad_col_threshold=0.01,
-                     method='columns', Nbin=50, wavelength_bins=np.arange(2000,8100,100),
-                     verbose = 0, show_plots = 0, save_plots = 0, output_dir = None):
-    """Bins light curves using the given binning scheme.
+def get_wlc(specs, specs_err, norm_lim):
+
+    '''
+    
+    Function to compute the white light curve
+
+    '''
+    
+    # normalization factor
+    norm_factor = np.median(np.sum(specs[:norm_lim, :], axis = 1))
+
+    wlc = np.sum(specs, axis = 1) / norm_factor
+    err = np.sqrt(np.sum(specs_err**2, axis = 1)) / norm_factor
+
+    return wlc, err
+
+
+
+def get_speclcs(specs, specs_err, waves, bins, norm_lim = 8):
+
+    '''
+    
+    Function to generate the spectral light curves
+    
+    '''
+
+    lc_binned, lc_error, wave_edges_acc= [], [], []
+
+    waves_mid = (waves[:-1] + waves[1:])/2
+    waves_mid =  np.concatenate(([2*waves[0] - waves_mid[0]], waves_mid, [2*waves[-1] - waves_mid[-1]]))
+
+    if np.isscalar(bins):
+        wave_edges = np.arange(waves[0], waves[-1], bins)
+    else:
+        wave_edges = bins
+        
+    wave_cents = (wave_edges[1:] + wave_edges[:-1])/2
+    wave_edges_acc.append(waves_mid[0])
+
+    for i in range(len(wave_cents)):
+
+        mask = (waves >= wave_edges[i]) & (waves < wave_edges[i + 1]) # do this more accurately
+        if not np.any(mask==True):
+            # The entire mask is false, so must pass and delete this wave cent.
+            wave_cents = np.delete(wave_cents,i)
+            continue
+
+        wave_edges_acc.append(waves_mid[np.where(mask == True)[0][-1] + 1])
+    
+        norm_factor = np.median(np.sum(specs[:norm_lim, mask], axis = 1))
+        lc_binned.append(np.sum(specs[:, mask], axis = 1) / norm_factor)
+        lc_error.append(np.sqrt(np.sum(specs_err[:, mask]**2, axis = 1)) / norm_factor)
+    
+    wave_edges_acc = np.array(wave_edges_acc)
+    wave_cents_acc = (wave_edges_acc[1:] + wave_edges_acc[:-1])/2
+
+    return np.array(lc_binned), np.array(lc_error), wave_cents, wave_edges
+
+
+
+def bin_light_curves(obs, order, rem_exp = None, norm_lim = 10, bins = 100):
+    """_summary_
 
     Args:
-        oneDspec (np.array): 1D spectra for given order as a function of time,
-        with indices time and wavelength.
-        oneDerr (np.array): 1D uncertainties for given order as a function of time,
-        with indices time and wavelength.
-        wave (np.array): wavelength solution for spectra.
-        time (np.array): timestamps of the exposures in the spectra.
-        order (str): for labelling plots correctly.
-        reject_bad_cols (bool): if True, mask columns deemed too noisy.
-        bad_col_threshold (float): the lower the threshold, the less noisiness
-        we tolerate being in our columns.
-        method (str, optional): binning method, can be either 'columns' or
-        'wavelengths'. Defaults to 'columns'.
-        Nbin (int, optional): if method is 'columns', how many columns to bin.
-        Defaults to 50.
-        wavelength_bins (list or np.array, optional): if method is 'wavelengths',
-        the edges of each bin in angstroms. Defaults to np.arange(2000,8100,100).
-        verbose (int, optional): How detailed you want the printed statements
-        to be. Defaults to 0.
-        show_plots (int, optional): How many plots you want to show. Defaults to 0.
-        save_plots (int, optional): How many plots you want to save. Defaults to 0.
-        output_dir (str, optional): Where to save the plots to, if save_plots
-        is greater than 0. Defaults to None.
+        obs (_type_): _description_
+        system_params (_type_): _description_
+        use_norm (bool, optional): _description_. Defaults to False.
+        rem_exp (_type_, optional): _description_. Defaults to None.
+        norm_lim (int, optional): _description_. Defaults to 10.
+        bins (int, optional): _description_. Defaults to 100.
 
     Returns:
-        np.array,np.array,np.array: binned light curves with central wavelengths
-        and wavelength bin sizes.
+        _type_: _description_
     """
-    # Column binning method.
-    if method == 'columns':
-        # do stuff
-        pass
 
-    # Wavelength binning method.
-    if method == 'wavelengths':
-        # do stuff
-        pass
-    return 'yay'
+    # Remove exposures:
+    if rem_exp:
+        obs = obs.drop_isel(exp_time = rem_exp)
+    
+    # load spectra data
+    specs = obs.spec.data
+    specs_err = obs.spec_err.data
+    
+    # load time
+    exp_times = obs.exp_time.data
+
+    # get wavelengths
+    waves = obs.wave.data
+
+    # reverse wavelengths if positive order
+    if order[0] == '+':
+        sort_vect = np.argsort(waves)
+        waves = waves[sort_vect]
+        specs = specs[:, sort_vect]
+        specs_err = specs_err[:, sort_vect]
+
+    # compute white light curve
+    wlc, wlc_err = get_wlc(specs, specs_err, norm_lim)
+
+    # compute spectroscopic light curves
+    spec_lcs, spec_lcs_errs, wave_cents, wave_edges = get_speclcs(specs, specs_err, waves, bins, norm_lim=norm_lim)
+    #print(np.shape(exp_times), np.shape(specs), np.shape(spec_lcs), np.shape(spec_lcs_errs), np.shape(wave_cents), np.shape(wave_edges))
+
+    # create xarray with data:
+    light_curves = xr.Dataset(
+            data_vars=dict(
+                wlc = (['exp_time'], wlc),
+                wlc_err = (['exp_time'], wlc_err),
+                spec_lc = (['wave_cents', 'exp_time'], spec_lcs),
+                spec_err = (['wave_cents', 'exp_time'], spec_lcs_errs),
+                ),
+            coords=dict(
+                exp_time = exp_times,
+                wave_cents = wave_cents,
+                wave_edges = wave_edges,
+        ),
+        #attrs = dict(ref_time=ref_time),
+    ) 
+
+    return light_curves
+
