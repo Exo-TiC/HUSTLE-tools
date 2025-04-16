@@ -52,6 +52,7 @@ from hustle_tools.stage_3 import bin_light_curves
 from hustle_tools.stage_3 import get_state_vectors
 
 
+
 def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
     """Wrapper for all Stages of the HUSTLE-tools pipeline.
 
@@ -473,7 +474,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
     ####### Run Stage 3 #######
     if 3 in stages:
-        
+      
         # read out the stage 3 config
         stage3_config = glob.glob(os.path.join(config_files_dir,'stage_3*'))[0]
         stage3_dict = parse_config(stage3_config)
@@ -521,5 +522,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
             # save light cuves
             save_data_S3(light_curves, output_dir=run_dir, order=order)
+
 
             

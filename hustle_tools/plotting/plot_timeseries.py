@@ -249,7 +249,6 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
 
     return
 
-
 def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, save_plot = False,
                               filename = None, output_dir = None):
     
@@ -369,3 +368,4 @@ def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
 
 
     return 
+

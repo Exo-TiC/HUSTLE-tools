@@ -121,3 +121,4 @@ def bin_light_curves(obs, order, rem_exp = None, norm_lim = 10, bins = 100):
     ) 
 
     return light_curves
+

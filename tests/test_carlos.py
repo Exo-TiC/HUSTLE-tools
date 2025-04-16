@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from exotic_uvis.stage_1 import read_data
-from exotic_uvis.stage_1 import corner_bkg_subtraction
-from exotic_uvis.stage_1 import track_bkgstars
-from exotic_uvis.plotting import plot_exposure
-from exotic_uvis.stage_0 import quicklookup
-from exotic_uvis.stage_1 import free_iteration_rejection
+from hustle_tools.stage_1 import read_data
+from hustle_tools.stage_1 import corner_bkg_subtraction
+from hustle_tools.stage_1 import track_bkgstars
+from hustle_tools.plotting import plot_exposure
+from hustle_tools.stage_0 import quicklookup
+from hustle_tools.stage_1 import free_iteration_rejection
 
 # data directory of the form '/path to directory with flt files/'
 data_dir = '/Users/carlos/Documents/PhD/WASP178/INPUT/'

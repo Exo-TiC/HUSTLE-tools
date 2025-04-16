@@ -14,7 +14,6 @@ def load_data_S3(data_dir, order="+1", verbose = 0):
     Function to read in the outputs from stage 2
 
     """
-
     specs = xr.open_dataset(os.path.join(data_dir, f'specs_{order}.nc')) 
 
     return specs
@@ -22,6 +21,7 @@ def load_data_S3(data_dir, order="+1", verbose = 0):
 def save_data_S3(light_curves,
                 output_dir = None, order='+1',
                 filename = 'light_curves'):
+
     """Function to create and save xarray containing the information extracted
     from stage 3.
 
@@ -40,8 +40,8 @@ def save_data_S3(light_curves,
         _type_: _description_
     """
 
-    
     # Save results in Stage 2 folder 
     light_curves.to_netcdf(os.path.join(output_dir, f'{filename}_{order}.nc'))
 
     return 0
+

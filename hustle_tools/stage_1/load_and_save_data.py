@@ -25,7 +25,7 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
     """
 
     # initialize data structures
-    images, errors, data_quality, subarr_coords = [], [], [], []
+    images, errors, data_quality, subarr_coords, orbit_Ns = [], [], [], [], []
     exp_time, exp_time_UT, exp_duration, read_noise = [], [], [], []
     
     # iterate over all files in specs directory
@@ -58,12 +58,18 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
 
                 #run file through sub2full
                 y1,y2,x1,x2 = sub2full(os.path.join(specs_dir, filename), fullExtent=True)[0]
+
+                # pry orbit number out of filename
+                orbit_N = float(filename[2:4])
+
                 
                 # append data
                 images.append(image) 
                 errors.append(error) 
                 read_noise.append(np.median(np.sqrt(error**2 - image))) 
                 subarr_coords.append(np.array([y1,y2,x1,x2]))
+                orbit_Ns.append(orbit_N)
+
 
     # collapse subarr_coords
     subarr_coords = np.mean(np.array(subarr_coords),axis=0)
@@ -89,6 +95,8 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
             images=(["exp_time", "x", "y"], images),
             errors=(["exp_time", "x", "y"], errors),
             subarr_coords=(["index"],subarr_coords),
+            orbit_numbers=(["exp_time"],orbit_Ns),
+
             direct_image = (["x", "y"], direct_image),
             badpix_mask = (["exp_time", "x", "y"], np.ones_like(images, dtype = 'bool')),
             data_quality = (["exp_time", "x", "y"], data_quality),

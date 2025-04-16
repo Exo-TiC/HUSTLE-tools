@@ -93,7 +93,7 @@ def Stage0_info():
                                      '# ID of the observing program you want to query data from. On MAST, referred to as "proposal_ID".',
                                      '# Name of the target object you want to query data from. On MAST, referred to as "target_name".',
                                      "# str or None. If you are downloading proprietary data, please visit https://auth.mast.stsci.edu/token?suggested_name=Astroquery&suggested_scope=mast:exclusive_access to obtain an authentication token and enter it as a '' string here.",
-                                     "# lst of str or None. File extensions you want to download. If None, take all file extensions. Otherwise, take only the files specified. _flt.fits, _spt.fits recommended as minimum working case.",],
+                                     "# lst of str or None. File extensions you want to download. If None, take all file extensions. Otherwise, take only the files specified. _flt.fits, _spt.fits, _jit.fits recommended as minimum working case.",],
                            "Step 2":["# Bool. Whether to perform this step.",
                                      "# The visit number you want to operate on.",
                                      "# None or str. If you downloaded data in Step 1, leave this as None. If you have pre-downloaded data, please place all of it in filesfrom_dir. Don't sort it into sub-folders; HUSTLE-tools won't be able to find them if they are inside sub-folders!",],
