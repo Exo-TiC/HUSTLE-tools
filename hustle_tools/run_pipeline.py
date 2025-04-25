@@ -490,7 +490,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         for order in stage3_dict['orders']:
             # load the spectrum for this order
-            specs = load_data_S3(S3_data_path, order=order, verbose = stage3_dict['verbose'])
+            specs = load_data_S3(S3_data_path, order=order)
 
             # run binning
             #need to get how many exp per orbit for norm_lim
@@ -519,7 +519,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                                     order=order, 
                                                     show_plot=(stage3_dict['show_plots'] > 0),
                                                     save_plot=(stage3_dict['save_plots'] > 0),
-                                                    filename=f'raw',
+                                                    filename=f'rawslc_order{order}',
                                                     output_dir=run_dir)
 
             # save light cuves

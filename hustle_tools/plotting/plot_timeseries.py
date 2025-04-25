@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import matplotlib.cm as cm
 import matplotlib.pylab as pl
 
@@ -249,38 +251,81 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
 
     return
 
+
 def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, save_plot = False,
-                              filename = None, output_dir = None):
+                                        filename = None, output_dir = None):
+    """Plots a gif of the raw binned spectral light curves.
+
+    Args:
+        light_curves (_type_): _description_
+        order (_type_): _description_
+        show_plot (bool, optional): _description_. Defaults to False.
+        save_plot (bool, optional): _description_. Defaults to False.
+        filename (_type_, optional): _description_. Defaults to None.
+        output_dir (_type_, optional): _description_. Defaults to None.
+    """
     
+    # get needed data
     times = light_curves.exp_time.data
     spec_lcs = light_curves.spec_lc.data
-    spec_lcs_err = light_curves.spec_lc.data
-    wave_edges = light_curves.wave_edges.data
+    wave_cents = light_curves.wave_cents.data
 
+    # define colors
+    colors = pl.cm.jet(np.linspace(0, 1, len(wave_cents)))
 
+    # create animation of light curves
+    fig,ax = plt.subplots(figsize=(10, 7))
+    
+    # plot first light curve to get things started
+    spec_line, = ax.plot(times,spec_lcs[0],'o',ls='--',color = colors[0], markeredgecolor='black',
+                        label=r"{} order, {:.0F} $\AA$".format(order,wave_cents[0]))
+    spec_line.set_color(colors[0])
+    ax.axhline(y=1,color='k',ls=':')
+    leg = ax.legend(loc='upper right')
+    #ax.set_xlim(2000,8000)
+    #ax.set_ylim(0.99, 1.01)
+    ax.set_xlabel('Time of exposure')
+    ax.set_ylabel('Relative flux')
+    ax.set_title("{} order spectral light curve []".format(order))
 
-    # make this an animation
-    for i, lc in enumerate(spec_lcs):
+    # initialize 
+    def init():
+        spec_line.set_data([times,spec_lcs[0]])
+        spec_line.set_color(colors[0])
+        leg.get_texts()[0].set_text(r"{} order, {:.0F} $\AA$".format(order,wave_cents[0]))
 
-        plt.figure(figsize = (10, 7))
-        plt.plot(times, lc, 'o', color='indianred', markeredgecolor='black')
-        plt.xlabel('Time of exposure')
-        plt.ylabel('Counts')
-        plt.title("{} order spectral light curve []".format(order))
+        return spec_line,
 
-        if save_plot:
-            plot_dir = os.path.join(output_dir, 'plots') 
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir) 
-            filedir = os.path.join(plot_dir, f'{filename}_lc{i}.png')
-            #plt.savefig(filedir,dpi=300,bbox_inches='tight')
+    # define animation function
+    def animation_func(i):
+        # update line data
+        spec_line.set_data([times,spec_lcs[i]])
+        spec_line.set_color(colors[i])
+        leg.get_texts()[0].set_text(r"{} order, {:.0F} $\AA$".format(order,wave_cents[i]))
 
-        if show_plot:
-            plt.show(block=True)
+        return spec_line,
+        
+    # create and plot animation
+    animation = FuncAnimation(fig, animation_func, init_func = init,
+                              frames = len(spec_lcs), interval = 20)
+    plt.tight_layout()
 
-        plt.close() # save memory
+    # save animation
+    if save_plot:
+        plot_dir = os.path.join(output_dir, 'plots') 
+
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
+
+        animation.save(os.path.join(plot_dir, f'{filename}.gif'), writer = 'ffmpeg', fps = 5)
+
+    if show_plot:
+        plt.show(block = True)
+
+    plt.close() # save memory
 
     return 
+
 
 def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
                    filename=None, output_dir = None):
