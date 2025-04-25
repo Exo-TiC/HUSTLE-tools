@@ -1,13 +1,21 @@
 import numpy as np
+
 import xarray as xr
 
+
 def get_wlc(specs, specs_err, norm_lim):
+    """Computes the normalized white light curve
+    using the full 1D spectra.
 
-    '''
-    
-    Function to compute the white light curve
+    Args:
+        specs (np.array): spec.data of the obs xarray.
+        specs_err (np.array): spec_err.data of the obs xarray.
+        norm_lim (int): how many indices are considered out of transit.
 
-    '''
+    Returns:
+        np.array, np.array: white light curve and squared uncertainties
+        normalized by the out-of-transit flux.
+    """
     
     # normalization factor
     norm_factor = np.median(np.sum(specs[:norm_lim, :], axis = 1))
@@ -18,28 +26,51 @@ def get_wlc(specs, specs_err, norm_lim):
     return wlc, err
 
 
+def get_speclcs(specs, specs_err, waves,
+                bin_method, ncol, bins, norm_lim):
+    """Generates the spectral light curves from a series of 1D spectra.
 
-def get_speclcs(specs, specs_err, waves, bins, norm_lim = 8):
+    Args:
+        specs (np.array): spec.data of the obs xarray.
+        specs_err (np.array): spec_err.data of the obs xarray.
+        waves (np.array): wave.data of the obs xarray.
+        bin_method (str): technique to use for binning. Can be either
+        "wavelengths" or "columns".
+        ncol (int): if bin_method is "columns", how many detector columns
+        go into each bin.
+        bins (np.array or float): if bin_method is "wavelengths", either
+        the bin edges pre-defined or the spacing between each bin edge,
+        to be extrapolated from the lower and upper bounds of waves.
+        norm_lim (int): how many indices are considered out of transit.
 
-    '''
-    
-    Function to generate the spectral light curves
-    
-    '''
+    Returns:
+        np.array, np.array, np.array, np.array: the binned light curves,
+        flux uncertainties, and wavelength centers/bins for each curve.
+    """
 
     lc_binned, lc_error, wave_edges_acc= [], [], []
 
     waves_mid = (waves[:-1] + waves[1:])/2
     waves_mid =  np.concatenate(([2*waves[0] - waves_mid[0]], waves_mid, [2*waves[-1] - waves_mid[-1]]))
 
-    if np.isscalar(bins):
-        wave_edges = np.arange(waves[0], waves[-1], bins)
-    else:
-        wave_edges = bins
-        
+    # check bin technique
+    if bin_method == 'wavelengths':
+        # build our wavelength bins object, if needed
+        if np.isscalar(bins):
+            wave_edges = np.arange(waves[0], waves[-1], bins)
+        else:
+            wave_edges = bins
+
+    elif bin_method == 'columns':
+        # build our wavelength bins object by column index
+        wave_edges = np.arange(0,len(waves),ncol)
+        wave_edges = waves[wave_edges]
+
+    # get the actual bin edges and centers    
     wave_cents = (wave_edges[1:] + wave_edges[:-1])/2
     wave_edges_acc.append(waves_mid[0])
 
+    # and bin
     for i in range(len(wave_cents)):
 
         mask = (waves >= wave_edges[i]) & (waves < wave_edges[i + 1]) # do this more accurately
@@ -54,26 +85,37 @@ def get_speclcs(specs, specs_err, waves, bins, norm_lim = 8):
         lc_binned.append(np.sum(specs[:, mask], axis = 1) / norm_factor)
         lc_error.append(np.sqrt(np.sum(specs_err[:, mask]**2, axis = 1)) / norm_factor)
     
+    # array-ify it
     wave_edges_acc = np.array(wave_edges_acc)
     wave_cents_acc = (wave_edges_acc[1:] + wave_edges_acc[:-1])/2
 
     return np.array(lc_binned), np.array(lc_error), wave_cents, wave_edges
 
 
-
-def bin_light_curves(obs, order, rem_exp = None, norm_lim = 10, bins = 100):
-    """_summary_
+def bin_light_curves(obs, order, bin_method,
+                     bins = 100, ncol = 10,
+                     rem_exp = None, norm_lim = 10):
+    """Generates all white light and spectroscopic light curves according
+    to the selected binning techniques and data trimming requests
 
     Args:
-        obs (_type_): _description_
-        system_params (_type_): _description_
-        use_norm (bool, optional): _description_. Defaults to False.
-        rem_exp (_type_, optional): _description_. Defaults to None.
-        norm_lim (int, optional): _description_. Defaults to 10.
-        bins (int, optional): _description_. Defaults to 100.
+        obs (xarray): contains spec.data, spec_err.data, exp_time.data,
+        and wave.data which are all needed for binning.
+        order (str): used to ensure that the waves are sorted lowest to
+        highest, which they are in negative orders but aren't in positive.
+        bin_method (str): technique to use for binning. Can be either
+        "wavelengths" or "columns".
+        ncol (int): if bin_method is "columns", how many detector columns
+        go into each bin.
+        bins (np.array or float): if bin_method is "wavelengths", either
+        the bin edges pre-defined or the spacing between each bin edge,
+        to be extrapolated from the lower and upper bounds of waves.
+        rem_exp (np.array, optional): list of exposure times to remove, if
+        any frames need to be kicked. Defaults to None.
+        norm_lim (int): how many indices are considered out of transit.
 
     Returns:
-        _type_: _description_
+        xarray: the broadband and spectroscopic light curves for this order.
     """
 
     # Remove exposures:
@@ -101,7 +143,8 @@ def bin_light_curves(obs, order, rem_exp = None, norm_lim = 10, bins = 100):
     wlc, wlc_err = get_wlc(specs, specs_err, norm_lim)
 
     # compute spectroscopic light curves
-    spec_lcs, spec_lcs_errs, wave_cents, wave_edges = get_speclcs(specs, specs_err, waves, bins, norm_lim=norm_lim)
+    spec_lcs, spec_lcs_errs, wave_cents, wave_edges = get_speclcs(specs, specs_err, waves,
+                                                                  bin_method, ncol, bins, norm_lim)
     #print(np.shape(exp_times), np.shape(specs), np.shape(spec_lcs), np.shape(spec_lcs_errs), np.shape(wave_cents), np.shape(wave_edges))
 
     # create xarray with data:
@@ -121,4 +164,3 @@ def bin_light_curves(obs, order, rem_exp = None, norm_lim = 10, bins = 100):
     ) 
 
     return light_curves
-

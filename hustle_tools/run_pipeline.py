@@ -496,7 +496,9 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
             #need to get how many exp per orbit for norm_lim
             light_curves = bin_light_curves(specs, 
                                             order, 
-                                            bins = stage3_dict['wavelength_bins'], 
+                                            bin_method = stage3_dict['bin_method'],
+                                            bins = stage3_dict['wavelength_bins'],
+                                            ncol = stage3_dict['N_columns'],
                                             norm_lim = 7, 
                                             rem_exp = None)
 

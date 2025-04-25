@@ -12,11 +12,14 @@ import os
 
 
 def draw_ephemeris(ephemeris, period):
+    """Function to draw the ephemerides and find the correct mid transit time
 
-    """
+    Args:
+        ephemeris (_type_): _description_
+        period (_type_): _description_
     
-    Function to draw the ephemerides and find the correct mid transit time
-    
+    Returns:
+        float: 
     """
 
     def eph_func(x, t0):
@@ -42,13 +45,14 @@ def draw_ephemeris(ephemeris, period):
     return popt[0]
 
 
-
 def normalize(vects):
+    """Normalizes the state vectors.
 
-    """
-    
-    Function to normalize a set of arrays
-    
+    Args:
+        vects (np.array): pointing state vectors used for jitter decorrelation.
+
+    Returns:
+        np.array: normalized pointing state vectors.
     """
     if len(np.shape(vects)) > 1:
         medians = np.median(vects, axis = 1)[:, np.newaxis]
@@ -63,14 +67,16 @@ def normalize(vects):
     return state_vects
 
  
-
 def get_jitter_data(data_dir, res):
+    """Function to get the jitter data
 
+    Args:
+        data_dir (_type_): _description_
+        res (_type_): _description_
+
+    Returns:
+        _type_: _description_
     """
-    
-    Function to get the jitter data
-    
-    """ 
 
     jitter_vals = []
     var_names = []
@@ -109,13 +115,18 @@ def get_jitter_data(data_dir, res):
     return jitter_vals, jitter_names
 
 
-
 def get_state_vectors(res, data_dir = None, method = 'jit_dec', include_jitter = False, plot = False):
+    """Function to prepare the state vectors
 
-    """
-    
-    Function to prepare the state vectors
-    
+    Args:
+        res (_type_): _description_
+        data_dir (_type_, optional): _description_. Defaults to None.
+        method (str, optional): _description_. Defaults to 'jit_dec'.
+        include_jitter (bool, optional): _description_. Defaults to False.
+        plot (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        _type_: _description_
     """
     
     # calculate phase vector
@@ -173,7 +184,6 @@ def get_state_vectors(res, data_dir = None, method = 'jit_dec', include_jitter =
             ax.set_title(varname)
             i += 1
         plt.show(block=True)
-
 
 
     return state_vectors
