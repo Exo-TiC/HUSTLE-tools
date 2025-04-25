@@ -53,6 +53,7 @@ def save_data_S2(obs, spec, spec_err,
             spec = (['exp_time', 'x'], spec),
             spec_err = (['exp_time', 'x'], spec_err),
             trace = (['exp_time', 'x'], trace_y),
+            orbit_numbers = (['exp_time',], obs.orbit_numbers.data),
             ),
         coords=dict(
             wave=(['x'], wavelengths),

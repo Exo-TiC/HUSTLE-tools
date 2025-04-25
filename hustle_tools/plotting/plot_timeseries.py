@@ -257,12 +257,17 @@ def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, 
     """Plots a gif of the raw binned spectral light curves.
 
     Args:
-        light_curves (_type_): _description_
-        order (_type_): _description_
-        show_plot (bool, optional): _description_. Defaults to False.
-        save_plot (bool, optional): _description_. Defaults to False.
-        filename (_type_, optional): _description_. Defaults to None.
-        output_dir (_type_, optional): _description_. Defaults to None.
+        light_curves (xarray): Stage 3 binned light curves xarray.
+        order (str, optional): which order we are plotting, for plot title.
+        Defaults to "+1".
+        show_plot (bool, optional): whether to interrupt execution to
+        show the user the plot. Defaults to False.
+        save_plot (bool, optional): whether to save this plot to a file.
+        Defaults to False.
+        filename (str, optional): name to give this file, if saving.
+        Defaults to None.
+        output_dir (str, optional): where to save the file, if saving.
+        Defaults to None.
     """
     
     # get needed data
@@ -282,8 +287,6 @@ def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, 
     spec_line.set_color(colors[0])
     ax.axhline(y=1,color='k',ls=':')
     leg = ax.legend(loc='upper right')
-    #ax.set_xlim(2000,8000)
-    #ax.set_ylim(0.99, 1.01)
     ax.set_xlabel('Time of exposure')
     ax.set_ylabel('Relative flux')
     ax.set_title("{} order spectral light curve []".format(order))
@@ -329,15 +332,21 @@ def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, 
 
 def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
                    filename=None, output_dir = None):
-    """_summary_
+    """Plots a two-column waterfall plot of all spectroscopic light curves
+    within the order.
 
     Args:
-        light_curves (_type_): _description_
-        order (_type_): _description_
-        show_plot (bool, optional): _description_. Defaults to False.
-        save_plot (bool, optional): _description_. Defaults to False.
-        filename (_type_, optional): _description_. Defaults to None.
-        output_dir (_type_, optional): _description_. Defaults to None.
+        light_curves (xarray): Stage 3 binned light curves xarray.
+        order (str, optional): which order we are plotting, for plot title.
+        Defaults to "+1".
+        show_plot (bool, optional): whether to interrupt execution to
+        show the user the plot. Defaults to False.
+        save_plot (bool, optional): whether to save this plot to a file.
+        Defaults to False.
+        filename (str, optional): name to give this file, if saving.
+        Defaults to None.
+        output_dir (str, optional): where to save the file, if saving.
+        Defaults to None.
     """
 
     # import data

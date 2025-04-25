@@ -493,13 +493,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
             specs = load_data_S3(S3_data_path, order=order)
 
             # run binning
-            #need to get how many exp per orbit for norm_lim
             light_curves = bin_light_curves(specs, 
                                             order, 
                                             bin_method = stage3_dict['bin_method'],
                                             bins = stage3_dict['wavelength_bins'],
                                             ncol = stage3_dict['N_columns'],
-                                            norm_lim = 7, 
+                                            norm_lim = len([i for i in specs.orbit_numbers.data if i == 1]), 
                                             rem_exp = None)
 
             # get jitter vectors 

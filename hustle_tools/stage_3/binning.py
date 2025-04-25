@@ -117,7 +117,6 @@ def bin_light_curves(obs, order, bin_method,
     Returns:
         xarray: the broadband and spectroscopic light curves for this order.
     """
-
     # Remove exposures:
     if rem_exp:
         obs = obs.drop_isel(exp_time = rem_exp)
@@ -160,7 +159,7 @@ def bin_light_curves(obs, order, bin_method,
                 wave_cents = wave_cents,
                 wave_edges = wave_edges,
         ),
-        #attrs = dict(ref_time=ref_time),
     ) 
 
     return light_curves
+
