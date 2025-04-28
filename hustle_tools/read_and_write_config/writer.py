@@ -319,11 +319,11 @@ def Stage3_info():
                        "Step 2":["bin_method",
                                  "wavelength_bins",
                                  "N_columns",
+                                 "normalize",
                                  "reject_bad_cols",
                                  "bad_col_thres"],
                        "Step 3":["time_binning",
-                                 "sigma_clip",
-                                 "normalize",],
+                                 "sigma_clip",],
                        }
     
     subsection_comments = {"Setup":["# Directory where your current project files are stored. This folder should contain the specimages/, directimages/, etc. folders with your data as well as the outputs folder.",
@@ -335,10 +335,10 @@ def Stage3_info():
                            "Step 2":["# Str. How to bin the light curves. Options are 'columns' (bin N columns at a time) or 'wavelengths' (bin from wavelength1 to wavelength2).",
                                      "# Lst of floats or numpy array. If bin_method is 'wavelengths', defines edges of each wavelength bin.",
                                      "# Int. If bin_method is 'columns', how many columns go into each bin.",
+                                     "# Bool. If True, normalizes curves by out-of-transit/eclipse flux.",
                                      "# bool. If True, masks contributions from columns deemed too noisy.",
                                      "# float. Used to control how aggressively we flag columns. The lower the number, the less noisiness we tolerate in our columns.",],
                            "Step 3":["# Int or None. If int, how many frames in time should be binned. Reduces computation time but degrades time resolution.",
-                                     "# Float or None. If float, the sigma at which to mask outliers in sigma clipping.",
-                                     "# Bool. If True, normalizes curves by out-of-transit/eclipse flux.",],
+                                     "# Float or None. If float, the sigma at which to mask outliers in sigma clipping.",],
                            }
     return header, subsection_headers, subsection_keys, subsection_comments

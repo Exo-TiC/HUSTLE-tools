@@ -3,13 +3,15 @@ import numpy as np
 import xarray as xr
 
 
-def get_wlc(specs, specs_err, norm_lim):
+def get_wlc(specs, specs_err, normalize, norm_lim):
     """Computes the normalized white light curve
     using the full 1D spectra.
 
     Args:
         specs (np.array): spec.data of the obs xarray.
         specs_err (np.array): spec_err.data of the obs xarray.
+        normalize (bool, optional): whether to normalize extracted light
+        curves. Defaults to True.
         norm_lim (int): how many indices are considered out of transit.
 
     Returns:
@@ -18,8 +20,10 @@ def get_wlc(specs, specs_err, norm_lim):
     """
     
     # normalization factor
-    norm_factor = np.median(np.sum(specs[:norm_lim, :], axis = 1))
-
+    norm_factor = 1
+    if normalize:
+        norm_factor = np.median(np.sum(specs[:norm_lim, :], axis = 1))
+    
     wlc = np.sum(specs, axis = 1) / norm_factor
     err = np.sqrt(np.sum(specs_err**2, axis = 1)) / norm_factor
 
@@ -27,7 +31,8 @@ def get_wlc(specs, specs_err, norm_lim):
 
 
 def get_speclcs(specs, specs_err, waves,
-                bin_method, ncol, bins, norm_lim):
+                bin_method, ncol, bins,
+                normalize, norm_lim):
     """Generates the spectral light curves from a series of 1D spectra.
 
     Args:
@@ -41,6 +46,8 @@ def get_speclcs(specs, specs_err, waves,
         bins (np.array or float): if bin_method is "wavelengths", either
         the bin edges pre-defined or the spacing between each bin edge,
         to be extrapolated from the lower and upper bounds of waves.
+        normalize (bool, optional): whether to normalize extracted light
+        curves. Defaults to True.
         norm_lim (int): how many indices are considered out of transit.
 
     Returns:
@@ -80,8 +87,10 @@ def get_speclcs(specs, specs_err, waves,
             continue
 
         wave_edges_acc.append(waves_mid[np.where(mask == True)[0][-1] + 1])
-    
-        norm_factor = np.median(np.sum(specs[:norm_lim, mask], axis = 1))
+
+        norm_factor = 1
+        if normalize:
+            norm_factor = np.median(np.sum(specs[:norm_lim, mask], axis = 1))
         lc_binned.append(np.sum(specs[:, mask], axis = 1) / norm_factor)
         lc_error.append(np.sqrt(np.sum(specs_err[:, mask]**2, axis = 1)) / norm_factor)
     
@@ -94,7 +103,7 @@ def get_speclcs(specs, specs_err, waves,
 
 def bin_light_curves(obs, order, bin_method,
                      bins = 100, ncol = 10,
-                     rem_exp = None, norm_lim = 10):
+                     rem_exp = None, normalize = True, norm_lim = 10):
     """Generates all white light and spectroscopic light curves according
     to the selected binning techniques and data trimming requests
 
@@ -112,7 +121,11 @@ def bin_light_curves(obs, order, bin_method,
         to be extrapolated from the lower and upper bounds of waves.
         rem_exp (np.array, optional): list of exposure times to remove, if
         any frames need to be kicked. Defaults to None.
-        norm_lim (int): how many indices are considered out of transit.
+        normalize (bool, optional): whether to normalize extracted light
+        curves. Defaults to True.
+        norm_lim (int, optional): how many indices are considered out of transit
+        or out of eclipse. Defaults to 10.
+
 
     Returns:
         xarray: the broadband and spectroscopic light curves for this order.
@@ -139,11 +152,12 @@ def bin_light_curves(obs, order, bin_method,
         specs_err = specs_err[:, sort_vect]
 
     # compute white light curve
-    wlc, wlc_err = get_wlc(specs, specs_err, norm_lim)
+    wlc, wlc_err = get_wlc(specs, specs_err, normalize, norm_lim)
 
     # compute spectroscopic light curves
     spec_lcs, spec_lcs_errs, wave_cents, wave_edges = get_speclcs(specs, specs_err, waves,
-                                                                  bin_method, ncol, bins, norm_lim)
+                                                                  bin_method, ncol, bins,
+                                                                  normalize, norm_lim)
     #print(np.shape(exp_times), np.shape(specs), np.shape(spec_lcs), np.shape(spec_lcs_errs), np.shape(wave_cents), np.shape(wave_edges))
 
     # create xarray with data:

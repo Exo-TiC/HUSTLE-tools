@@ -498,6 +498,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                             bin_method = stage3_dict['bin_method'],
                                             bins = stage3_dict['wavelength_bins'],
                                             ncol = stage3_dict['N_columns'],
+                                            normalize = stage3_dict['normalize'],
                                             norm_lim = len([i for i in specs.orbit_numbers.data if i == 1]), 
                                             rem_exp = None)
 
