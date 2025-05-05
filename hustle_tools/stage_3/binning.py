@@ -72,6 +72,8 @@ def get_speclcs(specs, specs_err, waves,
         # build our wavelength bins object by column index
         wave_edges = np.arange(0,len(waves),ncol)
         wave_edges = waves[wave_edges]
+        # grab the last wavelength
+        wave_edges = np.append(wave_edges,waves[-1])
 
     # get the actual bin edges and centers    
     wave_cents = (wave_edges[1:] + wave_edges[:-1])/2
