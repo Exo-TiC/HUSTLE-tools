@@ -1,4 +1,5 @@
 import os
+import glob
 import shutil
 from urllib import request
 import unittest
@@ -44,13 +45,13 @@ class TestStage1(unittest.TestCase):
 
         config_path = os.path.join(cls.local_data_path, "G280_config")
         os.mkdir(config_path)
-        request.urlretrieve("http://www.stsci.edu/~WFC3/grism-resources/uvis-grism-sky-images/G280sky_chip2_flt_v1.0.fits",
+        request.urlretrieve("https://www.stsci.edu/~WFC3/grism-resources/uvis-grism-sky-images/G280sky_chip2_flt_v1.0.fits",
                             os.path.join(config_path,"Pagul_sky.fits"))
         cls.Pagul_path = os.path.join(config_path,"Pagul_sky.fits")
 
         # Modify loaded data to be easy to test on.
         # Create a template image which is the Pagul image with a star in the middle.
-        print("Replacing loaded data with the Pagul+ 2023 sky image...")
+        print("Replacing loaded data with the WFC3 UVIS grism v1.0 sky image...")
         x1,x2,y1,y2 = [int(x) for x in cls.xarray_data.subarr_coords.values]
         with fits.open(cls.Pagul_path) as fits_file:
             pagul_star = fits_file[0].data[y1:y2+1,x1:x2+1]
@@ -141,20 +142,23 @@ class TestStage1(unittest.TestCase):
         stage_1.fixed_iteration_rejection(self.xarray_tseries, sigmas=[10,10],
                                           replacement=None, verbose=2)
         self.assertEqual(np.count_nonzero(self.xarray_tseries.data_quality.data),9)
-
-        # WIP!
-        '''
+        for j in (1,3,7):
+            for i in (2,4,5):
+                # Make sure it found the cosmic rays.
+                self.assertEqual(self.xarray_tseries.data_quality.data[499,i,j],1)
+         
         # Replace the noise and do it again.
         for j in (1,3,7):
             for i in (2,4,5):
                 self.xarray_tseries.images.data[499,i,j] = 1e12
                 self.xarray_tseries.data_quality.data[499,i,j] = 0
         stage_1.free_iteration_rejection(self.xarray_tseries,
-                                         threshold=2, verbose=2)
+                                         threshold=10, verbose=2)
         self.assertEqual(np.count_nonzero(self.xarray_tseries.data_quality.data),9)
-
-        # obs = stage_1.sigma_clip_rejection(self.xarray_data, sigma=5)
-        '''
+        for j in (1,3,7):
+            for i in (2,4,5):
+                # Make sure it found the cosmic rays.
+                self.assertEqual(self.xarray_tseries.data_quality.data[499,i,j],1)
 
     def test_c_spatial_outlier_rejection(self):
         """ Clean hot pixels with various methods. """
@@ -163,20 +167,14 @@ class TestStage1(unittest.TestCase):
                                          n=1, build_fine_structure=False,
                                          contrast_factor=5, verbose=2)
         self.assertEqual(np.count_nonzero(self.xarray_data.data_quality.data),36)
-        
-        # WIP!
-        '''
-        # Replace the noise and do it again.
         for j in (250,1250,1750):
             for i in (150,250,350):
-                self.xarray_data.images.data[:,i,j] = 1e12
-                self.xarray_data.data_quality.data[:,i,j] = 0
-        stage_1.spatial_smoothing(self.xarray_data, type='2D_smooth', kernel=11,
-                                  sigma=10, bounds_set=None, verbose=2)
-        self.assertEqual(np.count_nonzero(self.xarray_data.data_quality.data),36)
-        '''
+                # Make sure it found the hot pixels.
+                for k in range(self.xarray_data.data_quality.data.shape[0]):
+                    self.assertEqual(self.xarray_data.data_quality.data[k,i,j],1)
     
     def test_d_confirm_cleaned_correctly(self):
+        """ Confirm correct number of bad pixels was detected. """
         # After all this cleaning, 9 CRs + 36 HPs = 45 bad pixels should have been found.
 
         # For the test data, we check that the 36 hot pixels were flagged in the DQ array.
@@ -198,7 +196,7 @@ class TestStage1(unittest.TestCase):
                                        median_on_columns=False)
         
         # Most of the background should be close to zero now. Check that >99% of the data is small!
-        check = (np.abs(self.xarray_data.images.data)<1).sum()
+        check = (np.abs(self.xarray_data.images.data)<1e-3).sum()
         self.assertTrue(check > 0.99*4*600*2100,
                         msg='Background subtraction failed!\nZeroed pixels: {:.2E} out of {:.2E} threshold for success'.format(check,0.99*4*600*2100))
 
@@ -260,6 +258,17 @@ class TestStage1(unittest.TestCase):
                                   y_retrieved,y_truth):
             self.assertAlmostEqual(xi,xt,delta=0.01)
             self.assertAlmostEqual(yi,yt,delta=0.01)
+    
+    def test_g_uvis_embed(self):
+        """ Check that hdul keywords for subarray pos are correctly fetched. """
+        files = sorted(glob.glob(os.path.join(self.local_data_path,"specimages","*flt.fits")))
+        for mdf in files:
+            coords = []
+            with fits.open(mdf) as hdul:
+                coords.append(stage_1.get_subarr_coords(hdul))
+        # Check that all coords retrieved are the same.
+        for coord in coords:
+            self.assertEqual(coord, coords[0])
 
 if __name__ == '__main__':
     unittest.main()

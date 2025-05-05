@@ -69,6 +69,17 @@ class TestStage0(unittest.TestCase):
         self.assertEqual(source_x,50)
         self.assertEqual(source_y,50)
 
+    def test_d_check_subarray(self):
+        """ Check for subarray coord discrepanies. """
+        xdiscs, ydiscs = stage_0.check_subarray(os.path.join(self.local_data_path,
+                                                             "directimages",
+                                                             "or01dr001_flt.fits"),
+                                                [os.path.join(self.local_data_path,
+                                                              "specimages",
+                                                              "or01fm001_flt.fits")])
+        self.assertEqual(xdiscs[0],0)
+        self.assertEqual(ydiscs[0],0)
+
 
 if __name__ == '__main__':
     unittest.main()
