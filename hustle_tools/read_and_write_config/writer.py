@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+
 
 def write_config(config_dict, run_name, stage, outdir):
     """Unpacks a dictionary and writes it out to a config file.
@@ -41,8 +43,15 @@ def write_config(config_dict, run_name, stage, outdir):
             for j, keyword in enumerate(subsection_keys[subsection]):
                 # Write the keyword, its stringed value, and the comment.
                 try:
-                    value = str(config_dict[keyword])
-                    f.write("{0:<15} {1:<60} {2:}\n".format(keyword, value, subsection_comments[subsection][j]))
+                    value = config_dict[keyword]
+                    if isinstance(value, str):
+                        f.write("{0:<15} {1:<60} {2:}\n".format(keyword, "\'"+value+"\'", subsection_comments[subsection][j]))
+                    elif type(value) is np.ndarray:
+                        value = str([i for i in value])
+                        f.write("{0:<15} {1:<60} {2:}\n".format(keyword, value, subsection_comments[subsection][j]))
+                    else:
+                        value = str(value)
+                        f.write("{0:<15} {1:<60} {2:}\n".format(keyword, value, subsection_comments[subsection][j]))
                 except IndexError:
                     print(subsection, subsection_keys[subsection])
                     print("Index error here!") # for debug, if this shows up your output file is bad :(
@@ -308,10 +317,12 @@ def Stage3_info():
     subsection_headers = ["# Setup for Stage 3",
                           "# Step 1: Read in the data",
                           "# Step 2: Light curve extraction",
+                          "# Step 3: Light curve post-processing",
                           ]
     
     subsection_keys = {"Setup":["toplevel_dir",
-                                "run_name",
+                                "input_run",
+                                "output_run",
                                 "verbose",
                                 "show_plots",
                                 "save_plots"],
@@ -327,7 +338,8 @@ def Stage3_info():
                        }
     
     subsection_comments = {"Setup":["# Directory where your current project files are stored. This folder should contain the specimages/, directimages/, etc. folders with your data as well as the outputs folder.",
-                                    "# Str. This is the name of the current run. It can be anything that does not contain spaces or special characters (e.g. $, %, @, etc.).",
+                                    "# Str. This is the name of the Stage 1 run you want to load.",
+                                    "# Str. This is the name to save the current run to. It can be anything that does not contain spaces or special characters (e.g. $, %, @, etc.).",
                                     "# Int from 0 to 2. 0 = print nothing. 1 = print some statements. 2 = print every action.",
                                     "# Int from 0 to 2. 0 = show nothing. 1 = show some plots. 2 = show all plots.",
                                     "# Int from 0 to 2. 0 = save nothing. 1 = save some plots. 2 = save all plots.",],

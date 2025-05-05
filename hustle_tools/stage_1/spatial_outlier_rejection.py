@@ -105,9 +105,15 @@ def spatial_smoothing(obs, type='1D_smooth', kernel=11, sigma=10, bounds_set=[[2
                                 title = f'Location of corrected pixels for Exposure {i}', mark_size = 1,
                                 show_plot=(show_plots == 2), save_plot=(save_plots == 2),
                                 output_dir=output_dir, filename = [f'spatialsmooth_location_frame{i}'])
-            
+
             # update image
+            raw_image = np.copy(image)
             image[bounds[0]:bounds[1], bounds[2]:bounds[3]] = sub_image_clean
+            dq = np.where(raw_image!=image,1,0)
+
+            # now update the obs and data quality array
+            obs.images[i] = obs.images[i].where(obs.images[i].values == image,image)
+            obs.data_quality[i] = obs.data_quality[i].where(obs.data_quality[i].values == dq,dq)
           
     return obs
 

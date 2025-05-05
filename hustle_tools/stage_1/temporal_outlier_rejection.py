@@ -220,8 +220,9 @@ def free_iteration_rejection(obs, threshold = 3.5,
                           show_plot=(show_plots == 1), save_plot=(save_plots == 1),
                           output_dir=output_dir, filename = [f'CR_location_frame{i}'])
     
-    # modify original images
+    # modify original images and dq
     obs.images.data = images
+    obs.data_quality.data = np.where(hit_map != 0, hit_map, obs.data_quality.data)
 
     # Report bad pixels.
     if verbose >= 1:

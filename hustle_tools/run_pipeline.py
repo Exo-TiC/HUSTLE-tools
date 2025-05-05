@@ -18,7 +18,7 @@ from hustle_tools.plotting import plot_waterfall
 from hustle_tools.stage_0 import collect_and_move_files
 from hustle_tools.stage_0 import get_files_from_mast
 from hustle_tools.stage_0 import locate_target
-from hustle_tools.stage_0 import check_spt_subarray
+from hustle_tools.stage_0 import check_subarray
 
 from hustle_tools.stage_1 import load_data_S1
 from hustle_tools.stage_1 import save_data_S1
@@ -93,8 +93,8 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         # locate target in direct image
         if stage0_dict['do_locate']:
             # check for direct image / spec image discrepancies
-            xdiscs, ydiscs = check_spt_subarray(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_spt.fits'),
-                                                sorted(glob.glob(os.path.join(os.path.join(stage0_dict['toplevel_dir'],'specimages'),'*spt.fits'))))
+            xdiscs, ydiscs = check_subarray(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_flt.fits'),
+                                                sorted(glob.glob(os.path.join(os.path.join(stage0_dict['toplevel_dir'],'specimages'),'*flt.fits'))))
             source_x, source_y = locate_target(os.path.join(stage0_dict['toplevel_dir'],'directimages/or01dr001_flt.fits'))
             # modify config keyword
             stage0_dict['location'] = [source_x,source_y]
@@ -246,6 +246,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                        obs.attrs['target_posy']]
 
         # displacements by 0th order tracking
+        obs["0th_order_pos"] = (("exp_time", "xy"), np.zeros((obs.exp_time.data.shape[0],2))) # placeholder in case you don't do this step
         if stage1_dict['do_0thtracking']:
             # FIX: The below hardcodes an adjustment to your guess that shifts it
             # from direct image pos to spec image. Hardcoding is something that we
@@ -288,14 +289,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         stage2_config = glob.glob(os.path.join(config_files_dir,'stage_2*'))[0]
         stage2_dict = parse_config(stage2_config)
 
-        # read the 'location' keyword from the Stage 0 config
-        # REDUNDANT: should have been done in stage 1
-        '''
-        stage0_output_config = os.path.join(stage2_dict['toplevel_dir'],
-                                            'outputs/stage0/stage_0_.hustle')
-        stage0_output_dict = parse_config(stage0_output_config)
-        '''
-
         # read data
         S2_data_path = os.path.join(stage2_dict['toplevel_dir'],
                                     os.path.join('outputs/stage1',stage2_dict['input_run']))
@@ -303,7 +296,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # get the location from the obs.nc file
         stage2_dict['location'] = [obs.attrs['target_posx'], obs.attrs['target_posy']]
-        print(stage2_dict['location']) # FIX: this should NOT be the default, it should have been updated
 
         # create output directory
         output_dir = os.path.join(stage2_dict['toplevel_dir'],'outputs')
@@ -522,8 +514,11 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                                     filename=f'rawslc_order{order}',
                                                     output_dir=run_dir)
 
-            # save light cuves
+            # save light curves
             save_data_S3(light_curves, output_dir=run_dir, order=order)
+            
+        # write config
+        write_config(stage3_dict, stage3_dict['output_run'], 3, run_dir)
 
 
             

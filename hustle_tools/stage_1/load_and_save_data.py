@@ -6,6 +6,7 @@ from astropy.io import fits
 import xarray as xr
 
 from wfc3tools import sub2full
+from hustle_tools.stage_1.uvis_embed import get_subarr_coords
 
 
 def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose = 2):
@@ -57,7 +58,9 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
                 exp_duration.append(hdul[0].header["EXPTIME"])
 
                 #run file through sub2full
-                y1,y2,x1,x2 = sub2full(os.path.join(specs_dir, filename), fullExtent=True)[0]
+                #y1,y2,x1,x2 = sub2full(os.path.join(specs_dir, filename), fullExtent=True)[0]
+                # fetch coord information straight from naxis, ltv keywords
+                y1,y2,x1,x2 = get_subarr_coords(hdul)
 
                 # pry orbit number out of filename
                 orbit_N = float(filename[2:4])
