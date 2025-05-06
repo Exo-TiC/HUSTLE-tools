@@ -223,9 +223,6 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
     cmap = cm.get_cmap('viridis')
     cs = cmap(np.linspace(0,1,len(tested_hws)))
 
-    # offsets
-    #offsets = np.arange(0, len(tested_hws))*0.001
-
     plt.figure(figsize=(10, 7))
     for wlc, hw, c in zip(wlcs, tested_hws, cs):
         if (hw == tested_hws[0] or hw == tested_hws[-1]):
@@ -289,7 +286,6 @@ def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, 
     leg = ax.legend(loc='upper right')
     ax.set_xlabel('Time of exposure')
     ax.set_ylabel('Relative flux')
-    ax.set_title("{} order spectral light curve []".format(order))
 
     # initialize 
     def init():
@@ -320,7 +316,7 @@ def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, 
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
 
-        animation.save(os.path.join(plot_dir, f'{filename}.gif'), writer = 'ffmpeg', fps = 5)
+        animation.save(os.path.join(plot_dir, f'{filename}.gif'), writer = 'ffmpeg', fps = 5, dpi = 300)
 
     if show_plot:
         plt.show(block = True)
@@ -363,9 +359,10 @@ def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
     half_ind = int(np.shape(lcs_raw)[0]/2)
   
     # create figure
-    plt.figure(figsize = (8, 35))
-    plt.title(f'Raw binned light curves order {order}')
-    ax1 = plt.subplot2grid((1, 2), (0, 0))
+    fig, (ax1, ax2) = plt.subplots(figsize=(8,35),sharex=True,sharey=True,
+                                   nrows=1,ncols=2)
+    plt.suptitle(f'Raw binned light curves order {order}', y=0.89)
+    #ax1 = plt.subplot2grid((1, 2), (0, 0))
 
     for i, lc in enumerate(lcs_raw[:half_ind]):
 
@@ -386,7 +383,14 @@ def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
     ax1.set_xlabel('Time from Mid-transit (days)')
     #ax1.set_ylim(ylims)
 
-    ax2 = plt.subplot2grid((1, 2), (0, 1), sharey = None, sharex = ax1)
+    t_range = exp_time[-1] - exp_time[0]
+    xticks = np.linspace(np.median(exp_time)-0.45*t_range,np.median(exp_time)+0.45*t_range,5)
+    xtick_labels = ["{:.2F}".format(t-np.median(exp_time)) for t in xticks]
+    ax1.set_xticks(xticks)
+    ax1.set_xticklabels(xtick_labels)
+    ax1.tick_params(which='both',axis='both',direction='in')
+
+    #ax2 = plt.subplot2grid((1, 2), (0, 1), sharey = ax1)#, sharex = ax1)
 
     for i, lc in enumerate(lcs_raw[half_ind:]):
 
@@ -407,12 +411,19 @@ def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
     ax2.set_xlabel('Time from Mid-transit (days)')
     ax2.set_yticks([])
 
+    t_range = exp_time[-1] - exp_time[0]
+    xticks = np.linspace(np.median(exp_time)-0.45*t_range,np.median(exp_time)+0.45*t_range,5)
+    xtick_labels = ["{:.2F}".format(t-np.median(exp_time)) for t in xticks]
+    ax2.set_xticks(xticks)
+    ax2.set_xticklabels(xtick_labels)
+    ax2.tick_params(which='both',axis='both',direction='in')
+
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir) 
-        filedir = os.path.join(plot_dir, f'{filename}_order{order}.png')
+        filedir = os.path.join(plot_dir, f'{filename}.png')
         plt.savefig(filedir, dpi=300, bbox_inches='tight')
 
     if show_plot:
