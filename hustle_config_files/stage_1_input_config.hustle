@@ -18,7 +18,7 @@ fixed_sigmas    [10,10]                                     # lst of float. The 
 replacement     None                                        # int or None. If int, replaces flagged outliers with the median of values within +/-replacement indices of the outlier. If None, uses the median of the whole timeseries instead.
 
 # Step 2b: Free iteration parameters
-do_free_iter   True                                         # Bool. Whether to use free iteration rejection to clean the timeseries.
+do_free_iter    True                                        # Bool. Whether to use free iteration rejection to clean the timeseries.
 free_sigma      3.5                                         # float. The sigma to reject outliers at in each iteration. Iterates over each pixel's timeseries until no outliers at this sigma level are found.
 
 # Step 3: Reject hot pixels with spatial detection
