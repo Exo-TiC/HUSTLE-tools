@@ -287,9 +287,6 @@ def fit_trace(obs, trace_x, trace_y,
     images = obs.images.data.copy()
     y_data = range(obs.dims['y'])
 
-    # generate random number for plotting
-    plot_ind = np.random.randint(0, np.shape(images)[0])
-
     # Iterate over all images.
     for i, image in enumerate(tqdm(images, desc = 'Computing trace... Progress:',
                                    disable=(verbose==0))):
@@ -345,7 +342,7 @@ def fit_trace(obs, trace_x, trace_y,
 
         # If true, plot all the traces over the image for comparison/validation.
         if save_plots > 0 or show_plots > 0:
-            if (show_plots == 2 or save_plots == 2) or i == plot_ind:
+            if (show_plots == 2 or save_plots == 2) or i == 0:
                 plot_exposure([image], line_data = [[trace_x, trace_y], [trace_x, trace]],
                             show_plot=(show_plots==2), save_plot=(save_plots==2),
                             filename=['trace_validation'],output_dir=output_dir)

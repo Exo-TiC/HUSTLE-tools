@@ -490,9 +490,6 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
     if prof_type == 'median':
         prof = spatial_profile_median(sub_images, show_plots=show_plots, 
                                       save_plots=save_plots, output_dir=output_dir) 
-        
-    # generate random number for plotting
-    plot_ind = np.random.randint(0, np.shape(sub_images)[0])
 
     # extract optimal spectrum
     for i, sub_image in enumerate(tqdm(sub_images, desc = 'Extracting optimal spectrum... Progress')):

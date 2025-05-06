@@ -49,6 +49,7 @@ from hustle_tools.stage_2 import remove_zeroth_order
 from hustle_tools.stage_3 import load_data_S3
 from hustle_tools.stage_3 import save_data_S3
 from hustle_tools.stage_3 import bin_light_curves
+from hustle_tools.stage_3 import clip_light_curves
 from hustle_tools.stage_3 import get_state_vectors
 
 
@@ -493,6 +494,12 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                             normalize = stage3_dict['normalize'],
                                             norm_lim = len([i for i in specs.orbit_numbers.data if i == 1]), 
                                             rem_exp = None)
+
+            # sigma clip outliers from light curves
+            if stage3_dict["sigma_clip"]:
+                light_curves = clip_light_curves(light_curves,
+                                                 sigma = stage3_dict['sigma_clip'],
+                                                 verbose = stage3_dict['verbose'])
 
             # get jitter vectors 
             state_vectors = get_state_vectors(specs, plot=(stage3_dict['show_plots'] > 0))
