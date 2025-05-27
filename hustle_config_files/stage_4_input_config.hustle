@@ -9,11 +9,25 @@ show_plots      2                                           # Int from 0 to 2. 0
 save_plots      2                                           # Int from 0 to 2. 0 = save nothing. 1 = save some plots. 2 = save all plots.
 
 # Step 1: Read in the data
+orders          ('+1','-1')                                 # List of string. The orders you want to load and operate on.
 
 # Step 2: Systematics setup ExoTiC-ISM systematics marginalisation
 marginalise     False                                       # Bool. If True, use ExoTiC-ISM to treat systematics. Takes much longer than jitter decorrelation but usually returns good results.
 time_limit      60                                          # Float. Time in minutes before marginalisation attempt is considered 'failed'.
 path_to_marg    './'                                        # Str. Path to the marginalisation.py code needed to run marginalisation.py.
+
+# Step 2a: System parameters
+rl              0.10                                        # Float. Planet radius in stellar radii.
+epoch           0.0                                         # Float. Approximate midtime of transit/eclipse in MJD.
+inclin          90                                          # Float. Fixed inclination in degrees
+ecc             0.0                                         # Float. Fixed eccentricity of orbit.
+omega           0.0                                         # Float. Fixed argument of periastron in degrees, only relevant if eccentricity is not zero.
+per             5                                           # Float. Fixed orbit period in days.
+aor             15                                          # Float. Fixed semimajor axis of orbit in stellar radii.
+metallicity     0.0                                         # Float. Stellar metallicity in dex.
+Teff            5700                                        # Float. Stellar effective temperature in Kelvin.
+logg            4.5                                         # Float. Log of stellar surface gravity in cgs units.
+
 
 # Step 3: Least-squares light curve fitting
 # WIP!

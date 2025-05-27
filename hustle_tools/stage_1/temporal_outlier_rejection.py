@@ -111,7 +111,7 @@ def fixed_iteration_rejection(obs, sigmas=[10,10], replacement=None,
             plot_exposure([obs.images.data[i]], scatter_data=[yhits, xhits],
                           title = 'Location of corrected pixels in frame {}'.format(i), mark_size = 1,
                           show_plot=(show_plots == 2), save_plot=(save_plots == 2),
-                          output_dir=output_dir, filename = [f'CR-free_location_frame{i}'])
+                          output_dir=output_dir, filename = [f'CR-fixed_location_frame{i}'])
             
     # modify original images and dq
     obs.images.data = images

@@ -181,7 +181,8 @@ def Stage1_info():
                        "Step 5b":["do_0thtracking",
                                   "location",],
                        "Step 5c":["do_bkg_stars",
-                                  "bkg_stars_loc",],
+                                  "bkg_stars_loc",
+                                  "bkg_window",],
                        "Step 6":["do_quicklook",],
                        "Step 7":["do_save",],
                        }
@@ -230,7 +231,8 @@ def Stage1_info():
                            "Step 5b":["# Bool. Whether to track frame displacements by centroiding the 0th order.",
                                       "# lst of float. Initial guess for the location of the target star. You can use this to bypass location fitting in Stage 1.",],
                            "Step 5c":["# Bool. Whether to track frame displacements by centroiding background stars.",
-                                      "# Lst of lst of float. Every list should indicate the estimated location of every background star",],
+                                      "# Lst of lst of float. Every list should indicate the estimated location of every background star",
+                                      "# Int. The width of the window to draw around the background stars. Useful to shrink this if tracking a star very near to the trace.",],
                            "Step 6":["# Bool. Whether to perform this step.",],
                            "Step 7":["# Bool. If True, saves the output xarray to be used in Stage 2.",],
                            }

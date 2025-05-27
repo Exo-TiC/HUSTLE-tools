@@ -262,6 +262,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         obs["meanstar_disp"] = (("exp_time", "xy"), np.zeros((obs.exp_time.data.shape[0],2))) # placeholder in case you don't do this step
         if stage1_dict['do_bkg_stars']:
             track_bkgstars(obs, bkg_stars=stage1_dict['bkg_stars_loc'], 
+                           window=stage1_dict['bkg_window'],
                            verbose=stage1_dict['verbose'],
                            show_plots=stage1_dict['show_plots'],
                            save_plots=stage1_dict['save_plots'],
