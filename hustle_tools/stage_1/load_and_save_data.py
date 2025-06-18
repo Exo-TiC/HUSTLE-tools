@@ -54,7 +54,7 @@ def load_data_S1(data_dir, skip_first_fm = False, skip_first_or = False, verbose
                 #print(repr(hdul[0].header))
                 exp_time.append((hdul[0].header['EXPSTART'] + hdul[0].header['EXPEND'])/2)
                 exp_time_UT.append((hdul[0].header['TIME-OBS']))
-                data_quality.append(hdul[3].data)
+                data_quality.append(np.zeros_like(hdul[3].data))
                 exp_duration.append(hdul[0].header["EXPTIME"])
 
                 #run file through sub2full

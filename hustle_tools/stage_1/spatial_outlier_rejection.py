@@ -191,6 +191,9 @@ def laplacian_edge_detection(obs, sigma=10, factor=2, n=2, build_fine_structure=
     # Define the Laplacian kernel.
     l = 0.25*np.array([[0,-1,0],[-1,4,-1],[0,-1,0]])
 
+    # Open a tracker for changed pixels.
+    cumulative_S = np.zeros_like(obs.images[0].values)
+
     # Iterate over each frame one at a time until the iteration stop condition is met by each frame.
     if verbose >= 1:
         print("Cleaning threshold=%.1f outliers with Laplacian edge detection..." % sigma)
@@ -264,6 +267,9 @@ def laplacian_edge_detection(obs, sigma=10, factor=2, n=2, build_fine_structure=
             xmid = int(S.shape[1]/2)
             S[0:-1,xmid-70:xmid+70] = 0 # FIX: currently hardcoded to assume the source / 0th order is near the middle of the frame.
 
+            # Track what was flagged.
+            cumulative_S += S
+
             # Report where data quality flags should be added and count pixels to be replaced.
             dq = np.where(S != 0, 1, dq)
             bad_pix_last_frame = -100
@@ -323,6 +329,14 @@ def laplacian_edge_detection(obs, sigma=10, factor=2, n=2, build_fine_structure=
                                   show_plot=(show_plots==2), save_plot=(save_plots==2), 
                                   output_dir=output_dir, filename = ['LED_Fine_Structure_Model'])
     
+    # Make a plot of where was hit.
+    if (show_plots == 1 or save_plots == 1):
+        xhits, yhits = np.where(cumulative_S != 0)
+        plot_exposure([obs.images.data[0]], scatter_data=[yhits, xhits],
+                      title = 'Location of corrected pixels', mark_size = 1,
+                      show_plot=(show_plots >= 1), save_plot=(save_plots >= 1),
+                      output_dir=output_dir, filename = [f'LED_location_of_all_corrected_pixels'])
+
     if verbose >= 1:
         print("All frames cleaned of spatial outliers by LED.")
     return obs

@@ -112,20 +112,16 @@ def Pagul_bckg_subtraction(obs, pagul_path, masking_parameter=0.001,
     # save background values
     obs['bkg_vals'] = xr.DataArray(data = scaling_parameters, dims = ['exp_time'])
 
-    # if true, plot calculated background values
+    # if true, plot calculated background values and compare to frame modes
     if save_plots > 0 or show_plots > 0:
         plot_bkgvals(obs.exp_time.data, scaling_parameters, method='pagul',
                      output_dir=output_dir, show_plot = (show_plots>0), save_plot = (save_plots>0))
         plot_exposure([obs.images.data[1], images[1]], title = 'Background Removal Example', 
                       show_plot=(show_plots>0), save_plot=(save_plots>0),
                       output_dir=output_dir, filename = ['bkg_before_subtraction', 'bkg_after_subtraction'])
-        
-    # if true, also plot a comparison of the
-    # scaling parameters against frame modes
-    if save_plots == 2 or show_plots == 2:
         plot_mode_v_params(obs.exp_time.data, modes, scaling_parameters,
                            output_dir=output_dir,
-                           show_plot=(show_plots==2), save_plot=(save_plots==2))
+                           show_plot=(show_plots>0), save_plot=(save_plots>0))
 
     # update the images to be corrected    
     obs.images.data = images
