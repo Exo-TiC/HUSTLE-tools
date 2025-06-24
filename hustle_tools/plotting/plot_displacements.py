@@ -19,11 +19,11 @@ def plot_bkg_stars(image, exp_time, mean_loc, mean_pos, stars_pos,
     """Function to plot the displacements of the background stars.
 
     Args:
-        image (np.array): 2D image array showing all of the stars in context.
-        exp_times (np.array): BJD exposure times for each frame.
-        mean_loc (np.array): mean absolute location of each star.
-        mean_pos (np.array): mean relative position of each star.
-        stars_pos (np.array): relative position of each star over time.
+        image (array-like): 2D image array showing all of the stars in context.
+        exp_times (array-like): BJD exposure times for each frame.
+        mean_loc (array-like): mean absolute location of each star.
+        mean_pos (array-like): mean relative position of each star.
+        stars_pos (array-like): relative position of each star over time.
         show_plot (bool, optional): whether to interrupt execution to
         show the user the plot. Defaults to False.
         save_plot (bool, optional): whether to save the plot to a file.
@@ -85,9 +85,9 @@ def plot_0th_order(exp_time, xs, ys,
     """Function to plot the location of the 0th order over time.
 
     Args:
-        exp_times (np.array): BJD exposure times for each frame.
-        xs (np.array): 0th order x positions.
-        ys (np.array): 0th order y positions.
+        exp_times (array-like): BJD exposure times for each frame.
+        xs (array-like): 0th order x positions.
+        ys (array-like): 0th order y positions.
         show_plot (bool, optional): whether to interrupt execution to
         show the user the plot. Defaults to False.
         save_plot (bool, optional): whether to save the plot to a file.

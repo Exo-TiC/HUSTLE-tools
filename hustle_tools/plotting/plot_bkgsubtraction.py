@@ -21,7 +21,7 @@ def plot_corners(image, corners,
     for background subtraction.
 
     Args:
-        image (np.array): 2D image from the obs xarray.
+        image (array-like): 2D image from the obs xarray.
         corners (lst of lsts): x, y bounds of each rectangle used to define
         the corners from which the background is measured.
         min (int, optional): darkest point for the colormap. Defaults to 1e-3.
@@ -73,8 +73,8 @@ def plot_bkgvals(exp_times, bkg_vals, method,
     """Function to create measured background value plots for all methods.
 
     Args:
-        exp_times (np.array): BJD exposure times for each frame.
-        bkg_vals (np.array): 1D or 2D array of measured background values.
+        exp_times (array-like): BJD exposure times for each frame.
+        bkg_vals (array-like): 1D or 2D array of measured background values.
         method (str): The method used for background subtraction, useful to
         distinguish each plot file from each other.
         output_dir (str, optional): output directory where the plot will be
@@ -126,9 +126,9 @@ def plot_mode_v_params(exp_times, modes, params,
     """Function to create a diagnostic plot for Pagul et al. bkg subtraction.
 
     Args:
-        exp_times (np.array): BJD exposure times for each frame.
-        modes (np.array): measured mode of each frame, used for comparison.
-        params (np.array): Pagul+ sky image scaling parameter. Ideally, the
+        exp_times (array-like): BJD exposure times for each frame.
+        modes (array-like): measured mode of each frame, used for comparison.
+        params (array-like): Pagul+ sky image scaling parameter. Ideally, the
         mode and scaling parameters should not be too different.
         output_dir (str, optional): output directory where the plot will be
         saved. Defaults to None.
