@@ -28,7 +28,7 @@ def get_images(data_dir,
         to be. Defaults to 0.
 
     Returns:
-        np.array,np.array,np.array,np.array: images, exposure times,
+        array-like,array-like,array-like,array-like: images, exposure times,
         flux of the whole images, and flux from the section.
     """
 
@@ -57,9 +57,11 @@ def get_images(data_dir,
 
             # locate section
             if not have_xy:
-                x, y = centroid_com(images[0]) # exploit the saturation of the 0th order to get in the vicinity of it
+                # exploit the saturation of the 0th order to get in the vicinity of it
+                x, y = centroid_com(images[0])
                 x, y = (int(x), int(y))
-                section = [y-20, y+40, x-350, x-100] # +1 order will always fall within these values, more or less
+                # +1 order will always fall within these values, more or less
+                section = [y-20, y+40, x-350, x-100]
                 have_xy = True
 
             total_flux.append(np.sum(image))
@@ -80,11 +82,11 @@ def parse_xarr(obs,
 
     Args:
         obs (xarray): xarray containing the reduced images.
-        verbose (int, optional): how detailed you want the printed statements to be.
-        Defaults to 0.
+        verbose (int, optional): how detailed you want the printed statements
+        to be. Defaults to 0.
 
     Returns:
-        np.array,np.array,np.array,np.array: images, exposure times,
+        array-like,array-like,array-like,array-like: images, exposure times,
         flux of the whole images, and flux from the section.
     """
 
@@ -105,9 +107,11 @@ def parse_xarr(obs,
                   disable=(verbose < 2)):
         # locate section
         if not have_xy:
-            x, y = centroid_com(images[0]) # exploit the saturation of the 0th order to get in the vicinity of it
+            # exploit the saturation of the 0th order to get in the vicinity of it
+            x, y = centroid_com(images[0])
             x, y = (int(x), int(y))
-            section = [y-20, y+40, x-350, x-100] # +1 order will always fall within these values, more or less
+            # +1 order will always fall within these values, more or less
+            section = [y-20, y+40, x-350, x-100]
             have_xy = True
         
         # append total and partial fluxes
@@ -126,10 +130,10 @@ def create_gif(exp_times, images, total_flux, partial_flux, section,
     """Function to create an animation showing all the exposures.
 
     Args:
-        exp_times (np.array): exposure times for each image.
-        images (np.array): array of 2D images to pull a light curve from.
-        total_flux (np.array): flux summed across each 2D image.
-        partial_flux (np.array): flux summed from the section of each 2D image.
+        exp_times (array-like): exposure times for each image.
+        images (array-like): array of 2D images to pull a light curve from.
+        total_flux (array-like): flux summed across each 2D image.
+        partial_flux (array-like): flux summed from the section of each 2D image.
         section (lst of int): the subsection of image you measured flux in.
         output_dir (str): where to save the gif to.
         show_fig (bool, optional): whether to show the figure or not.
@@ -217,9 +221,9 @@ def create_dq_gif(exp_times, images, dq, section,
     """Function to create an animation showing all the data quality flags.
 
     Args:
-        exp_times (np.array): exposure times for each image.
-        images (np.array): array of 2D images to pull a light curve from.
-        dq (np.array): Array of 2D images showing pixels flagged for DQ.
+        exp_times (array-like): exposure times for each image.
+        images (array-like): array of 2D images to pull a light curve from.
+        dq (array-like): Array of 2D images showing pixels flagged for DQ.
         section (lst of int): the subsection of image you measured flux in.
         output_dir (str): where to save the gif to.
         show_fig (bool, optional): whether to show the figure or not.

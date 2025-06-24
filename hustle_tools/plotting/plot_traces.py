@@ -22,6 +22,10 @@ def plot_profile_fit(y_vals, profile, gaussian_fit, cal_center, fit_center,
         gaussian_fit (array-like): fitted profiles as a function of y.
         cal_center (float): calculated center of the pulled profiles.
         fit_center (float): fitted center of the fitted profiles.
+        order (str, optional): which order is being plotted, for file naming.
+        Defaults to "+1".
+        column (int, optional): which column's fit is being plotted, for file
+        naming. Defaults to 0.
         show_plot (bool, optional): whether to show this plot.
         Defaults to False.
         save_plot (bool, optional): whether to save this plot.
@@ -29,7 +33,6 @@ def plot_profile_fit(y_vals, profile, gaussian_fit, cal_center, fit_center,
         output_dir (str, optional): where this plot is being saved to,
         if save_plot is True. Defaults to None.
     """
-
     plt.figure(figsize = (10, 7))
     plt.plot(y_vals, profile, color = 'indianred')
     plt.plot(y_vals, gaussian_fit, linestyle = '--', linewidth = 1.2, color = 'gray')
@@ -63,7 +66,8 @@ def plot_fitted_positions(trace_x, trace_y, trace, exp_num, fitted_trace = None,
     Args:
         trace_x (array-like): GRISMCONF solution to the columns.
         trace_y (array-like): GRISMCONF solution to the rows.
-        trace (array-like): _description_
+        trace (array-like): computed solution to the rows, to be compared to
+        the GRISMCONF solution.
         exp_num (int): which frame this is, for plot title and filename.
         fitted_trace (array-like, optional): a polynomial fit to the trace
         center, may or may not be performed. Defaults to None.
@@ -76,7 +80,6 @@ def plot_fitted_positions(trace_x, trace_y, trace, exp_num, fitted_trace = None,
         output_dir (str, optional): where to save the file, if saving.
         Defaults to None.
     """
-
     # plot the computed positions and compare to calibration trace
     plt.figure(figsize=(10, 7))
     plt.plot(trace_x, trace, 'o', alpha = 0.4, color='indianred', label='Profile centers')
@@ -102,11 +105,4 @@ def plot_fitted_positions(trace_x, trace_y, trace, exp_num, fitted_trace = None,
 
     plt.close() # save memory
 
-    return
-
-
-def plot_fitted_amplitudes():
-    return
-
-def plot_fitted_widths():
     return
