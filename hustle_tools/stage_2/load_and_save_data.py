@@ -67,9 +67,8 @@ def save_data_S2(obs, spec, spec_err,
         spectra['prof_disp'] = xr.DataArray(prof_disp, dims=['exp_time', 'x']) 
     if widths is not False:
         spectra['fit_widths'] = xr.DataArray(widths, dims=['exp_time', 'x']) 
-        
-    #for i in range(len(bkg_stars)):
-    #    spectra['stars{}_disp'.format(i + 1)] = obs['star{}_disp'.format(i)]   
+    
+    # save background star displacements 
     spectra['meanstar_disp'] = obs['meanstar_disp']
 
     # Save results in Stage 2 folder 
