@@ -41,10 +41,11 @@ def plot_bkg_stars(image, exp_time, mean_loc, mean_pos, stars_pos,
 
     # initialize figure and plot x motion of each star
     plt.figure(figsize = (10, 7))
-    plt.plot(exp_time, mean_pos[:, 0], '-o')
-    plt.plot(exp_time, np.transpose(stars_pos[:, :, 0]), '-o', alpha = 0.5)
-    plt.xlabel('Exposure times')
+    plt.plot(exp_time, mean_pos[:, 0], '-o', label='Mean displacement')
+    plt.plot(exp_time, np.transpose(stars_pos[:, :, 0]), '-o', alpha = 0.5, label='Star displacement')
+    plt.xlabel('Times of exposure')
     plt.ylabel('X pixel displacement')
+    plt.legend()
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -60,9 +61,9 @@ def plot_bkg_stars(image, exp_time, mean_loc, mean_pos, stars_pos,
 
     # initialize figure and plot y motion of each star
     plt.figure(figsize = (10, 7))
-    plt.plot(exp_time, mean_pos[:, 1], '-o')
-    plt.plot(exp_time, np.transpose(stars_pos[:, :, 1]), '-o', alpha = 0.5)
-    plt.xlabel('Exposure times')
+    plt.plot(exp_time, mean_pos[:, 1], '-o', label='Mean displacement')
+    plt.plot(exp_time, np.transpose(stars_pos[:, :, 1]), '-o', alpha = 0.5, label='Star Displacement')
+    plt.xlabel('Times of exposure')
     plt.ylabel('Y pixel displacement')
 
     if save_plot:
