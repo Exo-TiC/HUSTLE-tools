@@ -36,7 +36,7 @@ def plot_corners(image, corners,
     image = image.copy()
     image[image <= 0] = 1e-10
 
-    plt.figure(figsize = (20, 4))
+    plt.figure(figsize = (20, 5))
     plt.imshow(image, origin = 'lower', norm='log', 
                 vmin = min, vmax = max, 
                 cmap = 'gist_gray')
@@ -51,6 +51,7 @@ def plot_corners(image, corners,
         ax.add_patch(rect)
     plt.xlabel('Detector X-pixel')
     plt.ylabel('Detector Y-pixel')
+    plt.title('Region Used For Background Estimation')
     plt.colorbar()
 
     if save_plot:
@@ -90,7 +91,7 @@ def plot_bkgvals(exp_times, bkg_vals, method,
     if method != 'col-by-col':
         # if it's not col-by-col, we take a single bkg value per frame, 1D
         plt.plot(exp_times, bkg_vals, '-o', color='indianred')
-        plt.xlabel('Exposure (#)')
+        plt.xlabel('Time Of Exposure (MJD)')
         plt.ylabel('Background Counts (counts)')
         plt.title('Image Background Per Exposure')
         if method == 'Pagul':

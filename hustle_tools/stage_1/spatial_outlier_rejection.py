@@ -74,7 +74,7 @@ def spatial_smoothing(obs, type='1D_smooth', kernel=11, sigma=10, bounds_set=[[2
 
             # remove outliers with other routines
             elif type == 'polyfit':
-                print('More cleaning options')
+                print('More cleaning options will be added in the future')
 
             # save position of corrected outliers
             all_xhits = np.concatenate((all_xhits, xhits))

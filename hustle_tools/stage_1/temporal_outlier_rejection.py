@@ -204,7 +204,7 @@ def free_iteration_rejection(obs, threshold = 3.5,
         counts_per_frame = [np.count_nonzero(hit_map[i,:,:]) for i in range(hit_map.shape[0])]
         plot_flags_per_time([obs.exp_time.values,], [counts_per_frame,], style='scatter',
                             title='Temporal outliers counted per frame',
-                            xlabel=['time [mjd]',],
+                            xlabel=['Time of exposure',],
                             ylabel=['counts [#]',],
                             xmin = np.min(obs.exp_time.values), xmax = np.max(obs.exp_time.values),
                             ymin = 0.995*np.min(counts_per_frame), ymax = 1.005*np.max(counts_per_frame),

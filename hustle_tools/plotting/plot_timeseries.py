@@ -59,8 +59,7 @@ def plot_flags_per_time(series_x, series_y, style='line',
             plt.xlabel(xlabel[i])
         if ylabel:
             plt.ylabel(ylabel[i])
-        plt.colorbar()
-
+            
         if xmin or xmax:
             plt.xlim(xmin, xmax)
 
