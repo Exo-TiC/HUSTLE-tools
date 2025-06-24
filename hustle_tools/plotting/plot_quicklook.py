@@ -148,7 +148,6 @@ def create_gif(exp_times, images, total_flux, partial_flux, section,
     # create animation
     fig = plt.figure(figsize = (10, 7))
     gs = fig.add_gridspec(2, 2)
-    #fig.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.95, wspace=None, hspace = None)
   
     # initialize exposure subplot and add exposure
     ax1 = fig.add_subplot(gs[0, :])
@@ -156,23 +155,22 @@ def create_gif(exp_times, images, total_flux, partial_flux, section,
     # draw the box that defines the +1 rough aperture
     rect = patches.Rectangle((section[2], section[0]), section[3] - section[2], section[1] - section[0], linewidth=1, edgecolor='r', facecolor='none')
     ax1.add_patch(rect)
-    ax1.set_xlabel('Detector x pixel')
-    ax1.set_ylabel('Detector y pixel')
+    ax1.set_xlabel('Detector X-pixel')
+    ax1.set_ylabel('Detector Y-pixel')
 
     # initialize Flux sum subplot
     ax2 = fig.add_subplot(gs[1, 0])
     ax2.set_title('Total Image Flux', size = 10)
     sum_flux_line, = ax2.plot(exp_times, total_flux, '.', color = 'indianred')
-    #sum_flux_line,  = ax2.plot([], [], '.', color = 'indianred')
-    ax2.set_xlabel('Time of Exposure (BJD TDB)')
-    ax2.set_ylabel('Counts (e-)')
+    ax2.set_xlabel('Time Of Exposure (MJD)')
+    ax2.set_ylabel('Counts (counts)')
 
     # initialize transit subplot
     ax3 = fig.add_subplot(gs[1, 1])
-    ax3.set_title('Box image Flux', size = 10)
+    ax3.set_title('Box Image Flux', size = 10)
     transit_line, = ax3.plot(exp_times, partial_flux, '.', color = 'indianred')
-    ax3.set_xlabel('Time of Exposure (BJD TDB)')
-    ax3.set_ylabel('Counts (e-)')
+    ax3.set_xlabel('Time Of Exposure (MJD)')
+    ax3.set_ylabel('Counts (counts)')
     
 
     # initialize 
@@ -196,7 +194,8 @@ def create_gif(exp_times, images, total_flux, partial_flux, section,
         return sum_flux_line, transit_line
         
     # create and plot animation
-    animation = FuncAnimation(fig, animation_func, init_func = init, frames = np.shape(images)[0], interval = 20)
+    animation = FuncAnimation(fig, animation_func, init_func = init,
+                              frames = np.shape(images)[0], interval = 20)
     plt.tight_layout()
     if show_fig:
         plt.show(block = True)
@@ -235,7 +234,6 @@ def create_dq_gif(exp_times, images, dq, section,
     # create animation
     fig = plt.figure(figsize = (10, 7))
     gs = fig.add_gridspec(2, 2)
-    #fig.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.95, wspace=None, hspace = None)
   
     # initialize exposure subplot and add exposure
     ax1 = fig.add_subplot(gs[0, :])
@@ -243,30 +241,29 @@ def create_dq_gif(exp_times, images, dq, section,
     # draw the box that defines the +1 rough aperture
     rect = patches.Rectangle((section[2], section[0]), section[3] - section[2], section[1] - section[0], linewidth=1, edgecolor='r', facecolor='none')
     ax1.add_patch(rect)
-    ax1.set_xlabel('Detector x pixel')
-    ax1.set_ylabel('Detector y pixel')
+    ax1.set_xlabel('Detector X-Pixel')
+    ax1.set_ylabel('Detector Y-Pixel')
 
     # initialize total Dq flags per frame subplot
     ax2 = fig.add_subplot(gs[1, 0])
-    ax2.set_title('Flags per frame', size = 10)
+    ax2.set_title('Flags Per Frame', size = 10)
     dq_flags_per_frame = np.empty_like(exp_times)
     for k in range(dq.shape[0]):
         dq_flags_per_frame[k] = np.count_nonzero(dq[k,:,:])
     sum_flux_line, = ax2.plot(exp_times, dq_flags_per_frame, '.', color = 'indianred')
-    #sum_flux_line,  = ax2.plot([], [], '.', color = 'indianred')
-    ax2.set_xlabel('Time of Exposure (BJD TDB)')
-    ax2.set_ylabel('Flags (N)')
+    ax2.set_xlabel('Time Of Exposure (MJD)')
+    ax2.set_ylabel('Flags (#)')
 
     # initialize transit subplot
     ax3 = fig.add_subplot(gs[1, 1])
     n_tot = (section[1]-section[0])*(section[3]-section[2])
-    ax3.set_title('Flags per Box (total in box = {})'.format(n_tot), size = 10)
+    ax3.set_title('Flags Per Box (total = {})'.format(n_tot), size = 10)
     dq_flags_per_box = np.empty_like(exp_times)
     for k in range(dq.shape[0]):
         dq_flags_per_box[k] = np.count_nonzero(dq[k,section[0]:section[1],section[2]:section[3]])
     transit_line, = ax3.plot(exp_times, dq_flags_per_box, '.', color = 'indianred')
-    ax3.set_xlabel('Time of Exposure (BJD TDB)')
-    ax3.set_ylabel('Flags (N)')
+    ax3.set_xlabel('Time Of Exposure (MJD)')
+    ax3.set_ylabel('Flags (#)')
     
 
     # initialize 
@@ -290,7 +287,8 @@ def create_dq_gif(exp_times, images, dq, section,
         return sum_flux_line, transit_line
         
     # create and plot animation
-    animation = FuncAnimation(fig, animation_func, init_func = init, frames = np.shape(images)[0], interval = 20)
+    animation = FuncAnimation(fig, animation_func, init_func = init,
+                              frames = np.shape(images)[0], interval = 20)
     plt.tight_layout()
     if show_fig:
         plt.show(block = True)
@@ -336,12 +334,8 @@ def quicklookup(data_dir,
         have_dq = True
     
     # create animation gif
-    save_fig = False
-    if save_plots >= 1:
-        save_fig = True
-    show_fig = False
-    if show_plots >= 1:
-        show_fig = True
+    save_fig = True if save_plots >= 1 else False
+    show_fig = True if show_plots >= 1 else False
     create_gif(exp_times, images, total_flux, partial_flux, section, output_dir,
                show_fig=show_fig, save_fig=save_fig)
     if have_dq:

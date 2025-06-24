@@ -49,8 +49,8 @@ def plot_corners(image, corners,
                                  corner[1] - corner[0], linewidth=1, edgecolor='r', facecolor='none')
 
         ax.add_patch(rect)
-    plt.xlabel('Detector x-pixel')
-    plt.ylabel('Detector y-pixel')
+    plt.xlabel('Detector X-pixel')
+    plt.ylabel('Detector Y-pixel')
     plt.colorbar()
 
     if save_plot:
@@ -90,21 +90,21 @@ def plot_bkgvals(exp_times, bkg_vals, method,
     if method != 'col-by-col':
         # if it's not col-by-col, we take a single bkg value per frame, 1D
         plt.plot(exp_times, bkg_vals, '-o', color='indianred')
-        plt.xlabel('Exposure')
-        plt.ylabel('Background Counts')
-        plt.title('Image background per exposure')
+        plt.xlabel('Exposure (#)')
+        plt.ylabel('Background Counts (counts)')
+        plt.title('Image Background Per Exposure')
         if method == 'Pagul':
-            plt.ylabel('Pagul et al. image scaling parameter')
-            plt.title('Scaling parameter per exposure')
+            plt.ylabel('Pagul et al. Image Scaling Parameter (counts)')
+            plt.title('Scaling Parameter Per Exposure')
     
     else:
         # if it's col-by-col, we take a bkg value per column per frame, 2D
         v = np.nanmedian(bkg_vals)
         plt.imshow(bkg_vals,aspect=20, vmin=0.5*v,vmax=1.5*v)
         plt.colorbar(fraction=0.01)
-        plt.xlabel('Column #')
-        plt.ylabel('Exposure index')
-        plt.title("Image background columns by exposure")
+        plt.xlabel('Column (#)')
+        plt.ylabel('Exposure Index (#)')
+        plt.title("Image Background Columns By Exposure")
     
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -143,9 +143,9 @@ def plot_mode_v_params(exp_times, modes, params,
     # add the modes and params in different colors and markers
     plt.scatter(exp_times, modes, marker='s', color='red',label='mode')
     plt.scatter(exp_times, params, marker='o', color='k',label='scaling parameter')
-    plt.xlabel('Exposure')
-    plt.ylabel('Counts')
-    plt.title('Frame mode vs scaling parameter')
+    plt.xlabel('Exposure (#)')
+    plt.ylabel('Counts (counts)')
+    plt.title('Frame Mode Vs Scaling Parameter')
     plt.legend()
     
     if save_plot:
@@ -196,10 +196,10 @@ def plot_histogram(bin_cents, array, mode, median, exp_num,
 
     plt.axvline(median, linestyle = '--', color = 'dodgerblue', label='Median')
     plt.axvline(mode, linestyle = '--', color = 'gold', label='Mode')
-    plt.xlabel('Pixel Value')
-    plt.ylabel('Counts')
+    plt.xlabel('Pixel Value (counts)')
+    plt.ylabel('Counts (#)')
     plt.legend()
-    plt.title(f'Background Values histogram Exposure {exp_num}')
+    plt.title(f'Background Values Histogram, Exposure #{exp_num}')
 
     if save_plots:
         plot_dir = os.path.join(output_dir, 'plots') 

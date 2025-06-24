@@ -43,8 +43,9 @@ def plot_bkg_stars(image, exp_time, mean_loc, mean_pos, stars_pos,
     plt.figure(figsize = (10, 7))
     plt.plot(exp_time, mean_pos[:, 0], '-o')
     plt.plot(exp_time, np.transpose(stars_pos[:, :, 0]), '-o', alpha = 0.5)
-    plt.xlabel('Exposure times')
-    plt.ylabel('X pixel displacement')
+    plt.xlabel('Exposure Times (MJD)')
+    plt.ylabel('X Pixel Displacement (pixels)')
+    plt.title("Background Stars X Drift Over Time")
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -62,8 +63,9 @@ def plot_bkg_stars(image, exp_time, mean_loc, mean_pos, stars_pos,
     plt.figure(figsize = (10, 7))
     plt.plot(exp_time, mean_pos[:, 1], '-o')
     plt.plot(exp_time, np.transpose(stars_pos[:, :, 1]), '-o', alpha = 0.5)
-    plt.xlabel('Exposure times')
-    plt.ylabel('Y pixel displacement')
+    plt.xlabel('Exposure Times (MJD)')
+    plt.ylabel('Y Pixel Displacement (pixels)')
+    plt.title("Background Stars Y Drift Over Time")
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -99,8 +101,9 @@ def plot_0th_order(exp_time, xs, ys,
     # initialize figure and plot x motion of 0th order
     plt.figure(figsize = (10, 7))
     plt.plot(exp_time, xs, '-o')
-    plt.xlabel('Exposure times')
-    plt.ylabel('X pixel displacement')
+    plt.xlabel('Exposure Times (MJD)')
+    plt.ylabel('X Pixel Displacement (pixels)')
+    plt.title("0th Order X Drift Over Time")
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -117,8 +120,9 @@ def plot_0th_order(exp_time, xs, ys,
     # initialize figure and plot y motion of 0th order
     plt.figure(figsize = (10, 7))
     plt.plot(exp_time, ys, '-o')
-    plt.xlabel('Exposure times')
-    plt.ylabel('Y pixel displacement')
+    plt.xlabel('Exposure Times (MJD)')
+    plt.ylabel('Y Pixel Displacement (pixels)')
+    plt.title("0th Order Y Drift Over Time")
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
