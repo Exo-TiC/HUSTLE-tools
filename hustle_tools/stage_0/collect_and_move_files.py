@@ -24,7 +24,6 @@ def collect_and_move_files(visit_number, fromdir, outdir, verbose=2):
         os.makedirs(outdir)
     
     # Collect and sort files from the fromdir that are in the right visit.
-
     spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_files = collect_files(fromdir, visit_number, verbose)
 
     # Then sort by orbit.
@@ -39,7 +38,6 @@ def collect_and_move_files(visit_number, fromdir, outdir, verbose=2):
     # Then, catch direct files (marked with dr) and only take spt and flt files.
     direct_files = [f for f in files if ("dr" in f and ".fits" in f and "hst_" not in f)]
     direct_files = [f for f in direct_files if ("flt.fits" in f or "spt.fits" in f)]
-
     # Catch all jitter files.
     jit_files = [f for f in files if ("jit" in f and ".fits" in f and "hst_" not in f)]
     # Now catch files that were at least identified with an orbit of interest.
@@ -51,7 +49,6 @@ def collect_and_move_files(visit_number, fromdir, outdir, verbose=2):
 
     for files, target in zip((spec_files, direct_files, jit_files, visit_files, misc_files),
                              ("specimages","directimages","jitterfiles","visitfiles","miscfiles")):
-
         targetdir = os.path.join(outdir,target)
         if not os.path.exists(targetdir):
             os.makedirs(targetdir)
@@ -68,7 +65,6 @@ def collect_and_move_files(visit_number, fromdir, outdir, verbose=2):
 
 
 def identify_orbits(spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_files, verbose=2):
-
     """Opens each file and checks exposure time starts to find orbits.
 
     Args:
@@ -98,7 +94,6 @@ def identify_orbits(spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_
     bundle = sorted(bundle, key = lambda x: x[0]) # sorted by exposure time
 
     # Create association between iexr##xxx and or##fm###.
-
     rename = {bundle[0][1]:"or01fm001"}
 
     # Now detect jumps in exposure start time, which are expected to be separated by >35 minutes.
@@ -296,4 +291,3 @@ def collect_files(search_dir, visit_number, verbose=2):
     if verbose >= 1:
         print("Collected spec, direct, jitter, and misc files.")
     return spec_flt, spec_spt, direct_flt, direct_spt, jit_files, misc_files
-

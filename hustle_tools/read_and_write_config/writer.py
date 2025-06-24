@@ -15,13 +15,11 @@ def write_config(config_dict, run_name, stage, outdir):
     """
     # Get correct print info.
     if stage == 0:
-        header, subsection_headers, subsection_keys, subsection_comments = Stage0_info()
+        header, subsection_headers, subsection_keys, subsection_comments = stage0_info()
     if stage == 1:
-        header, subsection_headers, subsection_keys, subsection_comments = Stage1_info()
+        header, subsection_headers, subsection_keys, subsection_comments = stage1_info()
     if stage == 2:
-        header, subsection_headers, subsection_keys, subsection_comments = Stage2_info()
-    if stage == 3:
-        header, subsection_headers, subsection_keys, subsection_comments = Stage3_info()
+        header, subsection_headers, subsection_keys, subsection_comments = stage2_info()
     
     # And write.
     with open(os.path.join(outdir,"stage_{}_{}.hustle".format(stage, run_name)), mode='w') as f:
@@ -53,7 +51,7 @@ def write_config(config_dict, run_name, stage, outdir):
     print("Config file written.")
             
 
-def Stage0_info():
+def stage0_info():
     """Retrieves writer information for Stage 0.
 
     Returns:
@@ -104,7 +102,7 @@ def Stage0_info():
     return header, subsection_headers, subsection_keys, subsection_comments
 
 
-def Stage1_info():
+def stage1_info():
     """Retrieves writer information for Stage 1.
 
     Returns:
@@ -228,7 +226,7 @@ def Stage1_info():
     return header, subsection_headers, subsection_keys, subsection_comments
 
 
-def Stage2_info():
+def stage2_info():
     """Retrieves writer information for Stage 2.
 
     Returns:
@@ -292,53 +290,5 @@ def Stage2_info():
                                       "# Lst of ints. The half-width of extraction aperture to use for each order. For optimum extraction, you should make this big (>12 pixels at least). There is no 'preferred' half-width in optimum extraction due to the weights.",],
                            "Step 4":["# Float. Sigma at which to reject spectral outliers in time. Outliers are replaced with median of timeseries. Enter False to skip this step.",
                                      "# Bool. If True, uses cross-correlation to align spectra to keep wavelength solution consistent.",],
-                           }
-    return header, subsection_headers, subsection_keys, subsection_comments
-
-
-def Stage3_info():
-    """Retrieves writer information for Stage 3.
-
-    Returns:
-        str, list, dict, dict: header and comments for writing the config.
-    """
-
-    header = "# HUSTLE-tools config file for launching Stage 3: Binning"
-
-    subsection_headers = ["# Setup for Stage 3",
-                          "# Step 1: Read in the data",
-                          "# Step 2: Light curve extraction",
-                          ]
-    
-    subsection_keys = {"Setup":["toplevel_dir",
-                                "run_name",
-                                "verbose",
-                                "show_plots",
-                                "save_plots"],
-                       "Step 1":["orders",],
-                       "Step 2":["bin_method",
-                                 "wavelength_bins",
-                                 "N_columns",
-                                 "reject_bad_cols",
-                                 "bad_col_thres"],
-                       "Step 3":["time_binning",
-                                 "sigma_clip",
-                                 "normalize",],
-                       }
-    
-    subsection_comments = {"Setup":["# Directory where your current project files are stored. This folder should contain the specimages/, directimages/, etc. folders with your data as well as the outputs folder.",
-                                    "# Str. This is the name of the current run. It can be anything that does not contain spaces or special characters (e.g. $, %, @, etc.).",
-                                    "# Int from 0 to 2. 0 = print nothing. 1 = print some statements. 2 = print every action.",
-                                    "# Int from 0 to 2. 0 = show nothing. 1 = show some plots. 2 = show all plots.",
-                                    "# Int from 0 to 2. 0 = save nothing. 1 = save some plots. 2 = save all plots.",],
-                           "Step 1":["# List of string. The orders you want to load and operate on.",],
-                           "Step 2":["# Str. How to bin the light curves. Options are 'columns' (bin N columns at a time) or 'wavelengths' (bin from wavelength1 to wavelength2).",
-                                     "# Lst of floats or numpy array. If bin_method is 'wavelengths', defines edges of each wavelength bin.",
-                                     "# Int. If bin_method is 'columns', how many columns go into each bin.",
-                                     "# bool. If True, masks contributions from columns deemed too noisy.",
-                                     "# float. Used to control how aggressively we flag columns. The lower the number, the less noisiness we tolerate in our columns.",],
-                           "Step 3":["# Int or None. If int, how many frames in time should be binned. Reduces computation time but degrades time resolution.",
-                                     "# Float or None. If float, the sigma at which to mask outliers in sigma clipping.",
-                                     "# Bool. If True, normalizes curves by out-of-transit/eclipse flux.",],
                            }
     return header, subsection_headers, subsection_keys, subsection_comments
