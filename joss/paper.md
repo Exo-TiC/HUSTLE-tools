@@ -69,7 +69,7 @@ HUSTLE-tools is built from the 'Hazelnut' pipeline presented in @Boehm2024 and t
 # Acknowledgments
 We acknowledge contributions from the full HUSTLE team, and specifically testing by Ailsa Campbell. 
 V.A.B was funded through program number HST-GO-17183 provided through a grant from the STScI under NASA contract NAS5-26555.
-C.G. was funded by a La Caixa Fellowship and the Agency for Management of University and Research Grants from the Government of Catalonia (FI AGAUR).
+C.G. was funded by La Caixa Fellowship and the Agency for Management of University and Research Grants from the Government of Catalonia (FI AGAUR).
 D.G. and H.R.W were funded by UK Research and Innovation (UKRI) under the UK government’s Horizon Europe funding guarantee as part of an ERC Starter Grant [grant number EP/Y006313/1].
 This work benefited from the 2024 Exoplanet Summer Program in the Other Worlds Laboratory (OWL) at the University of California, Santa Cruz, a program funded by the Heising-Simons Foundation and NASA.
 
