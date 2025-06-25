@@ -1,7 +1,6 @@
 import os
 import glob
 import numpy as np
-import matplotlib.pyplot as plt
 
 from hustle_tools.read_and_write_config import parse_config
 from hustle_tools.read_and_write_config import write_config
@@ -10,7 +9,6 @@ from hustle_tools.plotting import plot_one_spectrum
 from hustle_tools.plotting import plot_spec_gif
 from hustle_tools.plotting import plot_2d_spectra
 from hustle_tools.plotting import plot_raw_whitelightcurve
-from hustle_tools.plotting import plot_raw_spectrallightcurves
 from hustle_tools.plotting import quicklookup
 
 from hustle_tools.stage_0 import collect_and_move_files
@@ -43,9 +41,6 @@ from hustle_tools.stage_2 import clean_spectra
 from hustle_tools.stage_2 import align_spectra
 from hustle_tools.stage_2 import align_profiles
 from hustle_tools.stage_2 import remove_zeroth_order
-
-#from hustle_tools.stage_3 import load_data_S3
-#from hustle_tools.stage_3 import save_data_S3
 
 
 def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
@@ -242,9 +237,9 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
 
         # displacements by 0th order tracking
         if stage1_dict['do_0thtracking']:
-            # FIX: The below hardcodes an adjustment to your guess that shifts it
-            # from direct image pos to spec image. Hardcoding is something that we
-            # want to avoid, so we need to think of a better way...
+            # FIX (Issue #39): Hard-coded guess values are used to shift from
+            # direct image pos to spec image. Hardcoding is something that we
+            # want to avoid, so we need to think of a better way.
             track_0thOrder(obs, guess=[100,150],
                            verbose=stage1_dict['verbose'],
                            show_plots=stage1_dict['show_plots'],
@@ -282,15 +277,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         # read out the stage 2 config
         stage2_config = glob.glob(os.path.join(config_files_dir,'stage_2*'))[0]
         stage2_dict = parse_config(stage2_config)
-
-        # read the 'location' keyword from the Stage 0 config
-        # REDUNDANT: should have been done in stage 1
-        '''
-        stage0_output_config = os.path.join(stage2_dict['toplevel_dir'],
-                                            'outputs/stage0/stage_0_.hustle')
-        stage0_output_dict = parse_config(stage0_output_config)
-        '''
-
+      
         # read data
         S2_data_path = os.path.join(stage2_dict['toplevel_dir'],
                                     os.path.join('outputs/stage1',stage2_dict['input_run']))
@@ -316,7 +303,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                             show_plots=stage2_dict['show_plots'], 
                                             save_plots=stage2_dict['save_plots'],
                                             output_dir=run_dir)
-            # test 0th order removal
+            # 0th order removal
             remove_zeroth_order(obs, 
                                 zero_pos = [x0th, y0th], 
                                 rmin = 100, rmax = 300, rwidth = 3, 
@@ -429,12 +416,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                                 filename = '2Dspec_order{}'.format(order),
                                 output_dir = run_dir)
                 
-                #plot_raw_spectrallightcurves(obs.exp_time.data, spec, order="+1",
-                #                show_plot = (stage2_dict['show_plots'] > 0), 
-                #                save_plot = (stage2_dict['save_plots'] > 0),
-                #                filename = 's2_2Dspec_order{}'.format(order),
-                #                output_dir = run_dir)
-                
                 plot_raw_whitelightcurve(obs.exp_time.data,spec,
                                          order=order,
                                          show_plot = (stage2_dict['show_plots'] > 0), 
@@ -467,18 +448,6 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
         write_config(stage2_dict, stage2_dict['output_run'], 2, run_dir)
         
 
-    ####### Run Stage 3 #######
-    if 3 in stages:
-        # read out the stage 3 config
-        stage3_config = glob.glob(os.path.join(config_files_dir,'stage_3*'))[0]
-        stage3_dict = parse_config(stage3_config)
-
-        # read data, one order at a time
-        S3_data_path = os.path.join(stage3_dict['toplevel_dir'],
-                                    os.path.join('outputs',stage3_dict['input_run']))
-
-        #for order in stage3_dict['orders']:
-            # load the spectrum for this order
-            #spex = load_data_S3(S3_data_path, order=order, verbose = stage3_dict['verbose'])
+    
 
             

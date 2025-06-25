@@ -85,20 +85,20 @@ def fixed_iteration_rejection(obs, sigmas=[10,10], replacement=None,
     if save_plots > 0 or show_plots > 0:
         thits, xhits, yhits = np.where(hit_map == 1)
         plot_exposure([obs.images.data[0], images[0]],
-                      title = 'Temporal Bad Pixel removal Example', 
+                      title = 'Temporal Bad Pixel Removal Example', 
                       show_plot=(show_plots >= 1), save_plot=(save_plots >= 1),
                       output_dir=output_dir, filename = ['CR_before_correction', 'CR_after_correction'])
 
         plot_exposure([obs.images.data[0]], scatter_data=[yhits, xhits],
-                      title = 'Location of corrected pixels', mark_size = 1,
+                      title = 'Location Of Corrected Pixels', mark_size = 1,
                       show_plot=(show_plots >= 1), save_plot=(save_plots >= 1),
                       output_dir=output_dir, filename = ['CR_location'])
         
         counts_per_frame = [np.count_nonzero(hit_map[i,:,:]) for i in range(hit_map.shape[0])]
         plot_flags_per_time([obs.exp_time.values,], [counts_per_frame,], style='scatter',
-                            title='Temporal outliers counted per frame',
-                            xlabel=['time [mjd]',],
-                            ylabel=['counts [#]',],
+                            title='Temporal Outliers Counted Per Frame',
+                            xlabel=['Time Of Exposure (MJD)',],
+                            ylabel=['Counts (counts)',],
                             xmin = np.min(obs.exp_time.values), xmax = np.max(obs.exp_time.values),
                             ymin = 0.995*np.min(counts_per_frame), ymax = 1.005*np.max(counts_per_frame),
                             show_plot=(show_plots>=1),save_plot=(save_plots>=1),
@@ -109,7 +109,7 @@ def fixed_iteration_rejection(obs, sigmas=[10,10], replacement=None,
         for i in range(len(images)):
             xhits, yhits = np.where(hit_map[i] == 1)
             plot_exposure([obs.images.data[i]], scatter_data=[yhits, xhits],
-                          title = 'Location of corrected pixels in frame {}'.format(i), mark_size = 1,
+                          title = 'Location Of Corrected Pixels, Exposure #{}'.format(i), mark_size = 1,
                           show_plot=(show_plots == 2), save_plot=(save_plots == 2),
                           output_dir=output_dir, filename = [f'CR_location_frame{i}'])
             
@@ -191,21 +191,21 @@ def free_iteration_rejection(obs, threshold = 3.5,
     if save_plots > 0 or show_plots > 0:
         thits, xhits, yhits = np.where(hit_map == 1)
         plot_exposure([obs.images.data[0], images[0]], min = 1e0, 
-                      title = 'Temporal Bad Pixel removal Example', 
+                      title = 'Temporal Bad Pixel Removal Example', 
                       show_plot=(show_plots > 1), save_plot=(save_plots > 1),
                       output_dir=output_dir,
                       filename = ['CR_before_correction', 'CR_after_correction'])
 
         plot_exposure([obs.images.data[0]], scatter_data=[yhits, xhits], min = 1e0, 
-                      title = 'Location of corrected pixels', mark_size = 1,
+                      title = 'Location Of Corrected Pixels', mark_size = 1,
                       show_plot=(show_plots > 1), save_plot=(save_plots > 1),
                       output_dir=output_dir, filename = ['CR_location'])
         
         counts_per_frame = [np.count_nonzero(hit_map[i,:,:]) for i in range(hit_map.shape[0])]
         plot_flags_per_time([obs.exp_time.values,], [counts_per_frame,], style='scatter',
-                            title='Temporal outliers counted per frame',
-                            xlabel=['time [mjd]',],
-                            ylabel=['counts [#]',],
+                            title='Temporal Outliers Counted Per Frame',
+                            xlabel=['Time Of Exposure (MJD)',],
+                            ylabel=['Counts (counts)',],
                             xmin = np.min(obs.exp_time.values), xmax = np.max(obs.exp_time.values),
                             ymin = 0.995*np.min(counts_per_frame), ymax = 1.005*np.max(counts_per_frame),
                             show_plot=(show_plots>=1),save_plot=(save_plots>=1),
@@ -216,7 +216,7 @@ def free_iteration_rejection(obs, threshold = 3.5,
         for i in range(len(images)):
             xhits, yhits = np.where(hit_map[i] == 1)
             plot_exposure([obs.images.data[i]], scatter_data=[yhits, xhits],
-                          title = 'Location of corrected pixels in frame {}'.format(i), mark_size = 1,
+                          title = 'Location Of Corrected Pixels, Exposure #{}'.format(i), mark_size = 1,
                           show_plot=(show_plots == 1), save_plot=(save_plots == 1),
                           output_dir=output_dir, filename = [f'CR_location_frame{i}'])
     

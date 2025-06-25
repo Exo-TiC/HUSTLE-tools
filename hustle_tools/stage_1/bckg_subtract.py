@@ -66,6 +66,10 @@ def Pagul_bckg_subtraction(obs, pagul_path, masking_parameter=0.001,
     d_test = obs.images[0].values
     bin_number = int(0.50*d_test.shape[0]*d_test.shape[1])
     
+    # def function to fit ims
+    def residuals_(A,x,y):
+        return np.ma.sum((y - (A*x))**2)
+
     # iterate over all images
     for k, image in enumerate(tqdm(images, desc = 'Fitting Pagul et al. sky image... Progress:',
                                    disable=(verbose<1))):
@@ -88,8 +92,6 @@ def Pagul_bckg_subtraction(obs, pagul_path, masking_parameter=0.001,
                           output_dir=output_dir, filename = ['bkg_pagul_mask',])
     
         # then fit the standard bckg to the masked frame
-        def residuals_(A,x,y):
-            return np.ma.sum((y - (A*x))**2)
         result = least_squares(residuals_, 1, args=(pagul_bckg[y1:y2+1,x1:x2+1], masked_frame))
         A = result.x[0]
 
@@ -151,7 +153,7 @@ def Gauss1D(x, H, A, x0, sigma):
 
 def calculate_mode(array, hist_min, hist_max, hist_bins, exp_num = 0, 
                    fit = None, show_plots = 0, save_plots = 0, output_dir=None):
-    """Function to return the mode of an image
+    """Function to return the mode of an image.
 
     Args:
         array (np.array): 2D image array.
@@ -233,7 +235,7 @@ def calculate_mode(array, hist_min, hist_max, hist_bins, exp_num = 0,
 def uniform_value_bkg_subtraction(obs, fit = None, bounds = None,
                                   hist_min = -20, hist_max = 50, hist_bins = 1000,
                                   verbose = 0, show_plots = 0, save_plots = 0, output_dir = None):
-    """ Function to compute a uniform background value per frame, using either
+    """Function to compute a uniform background value per frame, using either
      the full frame or using subsets of the image.
 
     Args:

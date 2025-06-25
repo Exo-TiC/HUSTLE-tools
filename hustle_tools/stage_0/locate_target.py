@@ -1,9 +1,9 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 from astropy.stats import sigma_clipped_stats
 from astropy.io import fits
 from photutils import DAOStarFinder
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def locate_target(direct_image,test=False):
@@ -149,6 +149,7 @@ def locate_target(direct_image,test=False):
                         satisfied = True
     print("Source selected:", xs, ys)
     return xs, ys
+
 
 def check_spt_subarray(direct_spt,spec_spts):
     """Checks the subarray corner info for the direct and spec spt files

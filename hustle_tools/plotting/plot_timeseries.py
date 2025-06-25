@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib.pylab as pl
 
 
 #define plotting parameters
@@ -58,8 +59,7 @@ def plot_flags_per_time(series_x, series_y, style='line',
             plt.xlabel(xlabel[i])
         if ylabel:
             plt.ylabel(ylabel[i])
-        plt.colorbar()
-
+            
         if xmin or xmax:
             plt.xlim(xmin, xmax)
 
@@ -122,9 +122,9 @@ def plot_raw_whitelightcurve(times, spec, order="+1",
 
     plt.figure(figsize = (10, 7))
     plt.plot(times, raw_wlc, 'o', color=colors[order], markeredgecolor='black')
-    plt.xlabel('Time of exposure')
-    plt.ylabel('Counts')
-    plt.title("Raw broad-band light curve, order {}".format(order))
+    plt.xlabel('Time Of Exposure (MJD)')
+    plt.ylabel('Counts (counts)')
+    plt.title("Raw Broad-band Light Curve, Order {}".format(order))
 
       
     if save_plot:
@@ -138,59 +138,6 @@ def plot_raw_whitelightcurve(times, spec, order="+1",
         plt.show(block=True)
 
     plt.close() # save memory
-
-    return 
-
-
-def plot_raw_spectrallightcurves(times, spec, order="+1",
-                                 show_plot = False, save_plot = False,
-                                 filename = None, output_dir = None):
-    """Plots the uncorrected spectrally-binned light curves for this order, as
-    diagnostics of your cleaning process.
-
-    Args:
-        times (np.array): mid-exposure time of each frame.
-        spec (np.array): 1D extracted spectra.
-        order (str, optional): which order we are plotting, for plot title.
-        Defaults to "+1".
-        show_plot (bool, optional): whether to interrupt execution to show the
-        user the plot. Defaults to False.
-        save_plot (bool, optional): whether to save this plot to a file.
-        Defaults to False.
-        filename (str, optional): name to give this file, if saving.
-        Defaults to None.
-        output_dir (str, optional): where to save the file, if saving.
-        Defaults to None.
-    """
-
-    # define order colors
-    colors = {"+1":'indianred',"-1":'dodgerblue',
-              "+2":'orangered',"-2":'royalblue',
-              "+3":'darkorange',"-3":'blue',
-              "+4":'orange',"-4":'deepskyblue'}    
-
-    for i, lc in enumerate(np.transpose(spec)):
-        n_oot = int(0.20*lc.shape[0]) # typically, first 20% of data is the first orbit, which is oot/ooe
-        raw_lc = lc/np.median(lc[:n_oot])
-
-        plt.figure(figsize = (10, 7))
-        plt.plot(times, raw_lc, 'o', color=colors[order], markeredgecolor='black')
-        plt.xlabel('Time of exposure')
-        plt.ylabel('Counts')
-        plt.title("{}th column's spectral light curve, order {}".format(i,order))
-
-      
-        if save_plot:
-            plot_dir = os.path.join(output_dir, 'plots') 
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir) 
-            filedir = os.path.join(plot_dir, f'{filename}_lc{i}.png')
-            plt.savefig(filedir,dpi=300,bbox_inches='tight')
-
-        if show_plot:
-            plt.show(block=True)
-
-        plt.close() # save memory
 
     return 
 
@@ -220,9 +167,6 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
     cmap = cm.get_cmap('viridis')
     cs = cmap(np.linspace(0,1,len(tested_hws)))
 
-    # offsets
-    #offsets = np.arange(0, len(tested_hws))*0.001
-
     plt.figure(figsize=(10, 7))
     for wlc, hw, c in zip(wlcs, tested_hws, cs):
         if (hw == tested_hws[0] or hw == tested_hws[-1]):
@@ -230,9 +174,9 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
         else:
             plt.scatter(obs.exp_time, wlc, color=c, alpha=0.75)
     plt.legend(loc='upper left', ncols=2)
-    plt.xlabel('Time of exposure')
-    plt.ylabel('Counts')
-    plt.title("Light curve for each tested halfwidth")
+    plt.xlabel('Time Of Exposure (MJD)')
+    plt.ylabel('Counts (counts)')
+    plt.title("Light Curve By Aperture Halfwidth")
     
     if save_plot:
         plot_dir = os.path.join(output_dir,'plots')

@@ -10,13 +10,6 @@ from hustle_tools.plotting import plot_exposure
 from hustle_tools.stage_2 import standard_extraction
 
 
-def spatial_profile_curved():
-    return 0
-
-def spatial_profile_curved_poly():
-    return 0
-
-
 def spatial_profile_smooth(image_org, kernel = 11, threshold = 5., std_window = 20, 
                            median_window = 7, show_plots=0, save_plots=0, output_dir=0):
     """Builds a spatial profile using 1D smoothing.
@@ -93,24 +86,6 @@ def spatial_profile_smooth(image_org, kernel = 11, threshold = 5., std_window = 
                         xhits.append(ind)
                         yhits.append(j)
 
-        # just some inside plots for sanity check
-        if (show_plots == 2 or save_plots == 2):   
-            plt.figure()
-            #plt.plot(image_org[j]/f_init)
-            plt.plot(image[j])
-            plt.plot(row_model)
-
-            if save_plots == 2:
-                plot_dir = os.path.join(output_dir,'plots')
-                if not os.path.exists(plot_dir):
-                    os.makedirs(plot_dir)
-                plt.savefig(os.path.join(plot_dir, 'spatialprofile_smooth.png'),
-                            dpi=300,bbox_inches='tight')
-            
-            if show_plots == 2:
-                plt.show(block=True)
-            
-            plt.close() # save memory
     
     # normalize spatial profile
     P_prof = np.array(P_prof)
@@ -193,8 +168,7 @@ def window_profile(image, init_pix, fin_pix, pol_degree = 6,
             # create residuals arrays and calculation deviation
             res = np.ma.array(D_row - row_fit, mask = ~row_mask)
             dev_row = res / np.ma.std(res)
-            #dev_row = np.ma.abs(res) / np.ma.std(res)
-
+           
             # location max deviation pixel
             max_dev_ind = np.ma.argmax(dev_row)
 
@@ -274,18 +248,10 @@ def spatial_profile(exp_ind, image_org, window = 40, threshold = 4., normalize =
     
     # if true, plot spatial profile
     if (show_plots==2) or (save_plots==2):
-
-        #plot_exposure([image_org], title = 'Spatial_profile', min=1e1, max=1e4,
-        #              show_plot=1, save_plot=0,
-        #              output_dir=None, filename = ['spatial_profile'])
-
-        plot_exposure([P_prof], title = f'Example of Spatial profile Exposure {exp_ind}', min=1e-4, max=1e0,
+        plot_exposure([P_prof], title = f'Example of Spatial Profile, Exposure #{exp_ind}', min=1e-4, max=1e0,
                       show_plot=(show_plots==2), save_plot=(save_plots==2),
                       output_dir=output_dir, filename = [f'spatial_profile_exp{exp_ind}'])
         
-        #plot_exposure([image, image_org], scatter_data=[xhits, yhits], title = 'Spatial_profile', 
-        #              show_plot=1, save_plot=0,
-        #              output_dir=None, filename = ['spatial_profile'])
         
     return P_prof, image, xhits, yhits
 
@@ -305,7 +271,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
         low_val (_type_): _description_
         up_val (_type_): _description_
         init_spec (_type_, optional): _description_. Defaults to None.
-        fit_thresh (_type_, optional): _description_. Defaults to 4..
+        fit_thresh (float, optional): _description_. Defaults to 4..
         fit_degree (int, optional): _description_. Defaults to 5.
         window (int, optional): _description_. Defaults to 50.
         correct_thresh (_type_, optional): _description_. Defaults to None.
@@ -317,7 +283,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
         is greater than 0. Defaults to None.
 
     Returns:
-        _type_: _description_
+        array-like: the spatial profile for optimal extraction.
     """
 
     # copy image data and extract y values
@@ -367,7 +333,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
 
         # create window profile
         curve_image_copy = curve_image.copy()
-        P_win, xhit, yhit, stds_win = window_profile(curve_image_copy, init_pix, fin_pix, threshold = fit_thresh, pol_degree = fit_degree) # curve image is being modified here
+        P_win, xhit, yhit, stds_win = window_profile(curve_image_copy, init_pix, fin_pix, threshold = fit_thresh, pol_degree = fit_degree)
 
         # normalize
         P_prof[:, init_pix:fin_pix] = P_win
@@ -399,7 +365,6 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
     stds_image = interpolate.griddata(np.transpose(grid_points), np.ravel(stds), (np.ravel(grid_x), np.ravel(grid_y)), method = 'linear')
     stds_image = np.reshape(stds_image, (len(y_vals), len(tx_main)))
     
-    #if correct_thresh:
     # mask and replace values
     mask_cr = stds_image > correct_thresh
     sub_image_org[mask_cr] = spatial_prof[mask_cr]
@@ -409,29 +374,12 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
     spatial_prof = spatial_prof/np.sum(spatial_prof, axis = 0)
         
     if show_plots==2 or save_plots==2:
-
-        #if correct_thresh:
-        # plot difference image
-        #utils.plot_image([sub_image_org, sub_image], min = 1., max = 4., show = False)
-        #utils.plot_image([sub_image, spatial_prof], scatter_data = [yhits, xhits], min = 1., max = 4., show = False)
-
         plot_exposure([spatial_prof], scatter_data = [yhits, xhits], #[sub_image, spatial_prof]
                         title = f'Example of Spatial profile Exposure {exp_ind}', min=1e-4, max=1e0,
                         show_plot=(show_plots==2), save_plot=(save_plots==2),
                         output_dir=output_dir, filename = [f'spatial_profile_exp{exp_ind}'])
 
-        # compute difference image
-        #diff_im = (sub_image - spatial_prof)/np.sqrt(spatial_prof) 
-
-        #plt.figure(figsize = (10, 7))
-        #plt.imshow(diff_im, origin = 'lower', vmin = 0, vmax = 10)
-        #plt.colorbar()
-   
-        #plt.figure(figsize = (10, 7))
-        #plt.imshow(stds_image, origin = 'lower', vmin = 0, vmax = 10)
-        #plt.colorbar()
-        #plt.show()
-
+    
     return spatial_prof
 
 
@@ -482,7 +430,7 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
 
     # get initial spectrum
     specs, specs_err = standard_extraction(obs,
-                                           halfwidth=12, # why not use the width input into this function?
+                                           halfwidth=12,
                                            trace_x=trace_x,
                                            trace_y=traces_y)
 
@@ -528,11 +476,6 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
             image = images[i]
             prof = spatial_profile_curved_poly(i, sub_image, image, trace_x, trace_y, low_val, up_val, init_spec = None, correct_thresh=7., window = 40,
                                                show_plots = show_plots, save_plots=save_plots, output_dir=output_dir)
-        
-        elif prof_type == 'curved_smooth':
-            image = images[i]
-            prof = spatial_profile_curved(i, sub_image, image, trace_x, trace_y, low_val, up_val, init_spec = spectrum, correct_thresh = 6., smooth_window = 7, median_window = 7,
-                                          show_plots = show_plots, save_plots=save_plots, output_dir=output_dir)
         
         if (show_plots==1 or save_plots==1) and (i == 0):
             plot_exposure([prof], title = f'Example of Spatial profile Exposure {i}', min=1e-4, max=1e0,

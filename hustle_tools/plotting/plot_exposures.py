@@ -19,7 +19,7 @@ def plot_exposure(images, line_data = None, scatter_data = None,
     """Function to plot an image given certain parameters.
 
     Args:
-        images (np.array): images from the obs.images.
+        images (array-like): images from the obs.images.
         line_data (list, optional): list of lists of x, y values denoting
         lines you want to draw on the plot. Defaults to None.
         scatter_data (list, optional): list of x, y points you want to
@@ -48,8 +48,8 @@ def plot_exposure(images, line_data = None, scatter_data = None,
         plt.imshow(image, origin = 'lower', norm='log', 
                    vmin = min, vmax = max, 
                    cmap = 'gist_gray', extent = extent)
-        plt.xlabel('Detector x-pixel')
-        plt.ylabel('Detector y-pixel')
+        plt.xlabel('Detector X-pixel')
+        plt.ylabel('Detector Y-pixel')
         plt.colorbar()
 
         if line_data:
