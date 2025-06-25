@@ -122,9 +122,9 @@ def plot_raw_whitelightcurve(times, spec, order="+1",
 
     plt.figure(figsize = (10, 7))
     plt.plot(times, raw_wlc, 'o', color=colors[order], markeredgecolor='black')
-    plt.xlabel('Time of exposure')
-    plt.ylabel('Counts')
-    plt.title("Raw broad-band light curve, order {}".format(order))
+    plt.xlabel('Time Of Exposure (MJD)')
+    plt.ylabel('Counts (counts)')
+    plt.title("Raw Broad-band Light Curve, Order {}".format(order))
 
       
     if save_plot:
@@ -138,59 +138,6 @@ def plot_raw_whitelightcurve(times, spec, order="+1",
         plt.show(block=True)
 
     plt.close() # save memory
-
-    return 
-
-
-def plot_raw_spectrallightcurves(times, spec, order="+1",
-                                 show_plot = False, save_plot = False,
-                                 filename = None, output_dir = None):
-    """Plots the uncorrected spectrally-binned light curves for this order, as
-    diagnostics of your cleaning process.
-
-    Args:
-        times (np.array): mid-exposure time of each frame.
-        spec (np.array): 1D extracted spectra.
-        order (str, optional): which order we are plotting, for plot title.
-        Defaults to "+1".
-        show_plot (bool, optional): whether to interrupt execution to show the
-        user the plot. Defaults to False.
-        save_plot (bool, optional): whether to save this plot to a file.
-        Defaults to False.
-        filename (str, optional): name to give this file, if saving.
-        Defaults to None.
-        output_dir (str, optional): where to save the file, if saving.
-        Defaults to None.
-    """
-
-    # define order colors
-    colors = {"+1":'indianred',"-1":'dodgerblue',
-              "+2":'orangered',"-2":'royalblue',
-              "+3":'darkorange',"-3":'blue',
-              "+4":'orange',"-4":'deepskyblue'}    
-
-    for i, lc in enumerate(np.transpose(spec)):
-        n_oot = int(0.20*lc.shape[0]) # typically, first 20% of data is the first orbit, which is oot/ooe
-        raw_lc = lc/np.median(lc[:n_oot])
-
-        plt.figure(figsize = (10, 7))
-        plt.plot(times, raw_lc, 'o', color=colors[order], markeredgecolor='black')
-        plt.xlabel('Time of exposure')
-        plt.ylabel('Counts')
-        plt.title("{}th column's spectral light curve, order {}".format(i,order))
-
-      
-        if save_plot:
-            plot_dir = os.path.join(output_dir, 'plots') 
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir) 
-            filedir = os.path.join(plot_dir, f'{filename}_lc{i}.png')
-            plt.savefig(filedir,dpi=300,bbox_inches='tight')
-
-        if show_plot:
-            plt.show(block=True)
-
-        plt.close() # save memory
 
     return 
 
@@ -220,9 +167,6 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
     cmap = cm.get_cmap('viridis')
     cs = cmap(np.linspace(0,1,len(tested_hws)))
 
-    # offsets
-    #offsets = np.arange(0, len(tested_hws))*0.001
-
     plt.figure(figsize=(10, 7))
     for wlc, hw, c in zip(wlcs, tested_hws, cs):
         if (hw == tested_hws[0] or hw == tested_hws[-1]):
@@ -230,9 +174,9 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
         else:
             plt.scatter(obs.exp_time, wlc, color=c, alpha=0.75)
     plt.legend(loc='upper left', ncols=2)
-    plt.xlabel('Time of exposure')
-    plt.ylabel('Counts')
-    plt.title("Light curve for each tested halfwidth")
+    plt.xlabel('Time Of Exposure (MJD)')
+    plt.ylabel('Counts (counts)')
+    plt.title("Light Curve By Aperture Halfwidth")
     
     if save_plot:
         plot_dir = os.path.join(output_dir,'plots')
@@ -247,124 +191,3 @@ def plot_aperture_lightcurves(obs, tested_hws, wlcs,
     plt.close() # save memory
 
     return
-
-def plot_raw_binned_spectrallightcurves(light_curves, order, show_plot = False, save_plot = False,
-                              filename = None, output_dir = None):
-    
-    times = light_curves.exp_time.data
-    spec_lcs = light_curves.spec_lc.data
-    spec_lcs_err = light_curves.spec_lc.data
-    wave_edges = light_curves.wave_edges.data
-
-
-
-    # make this an animation
-    for i, lc in enumerate(spec_lcs):
-
-        plt.figure(figsize = (10, 7))
-        plt.plot(times, lc, 'o', color='indianred', markeredgecolor='black')
-        plt.xlabel('Time of exposure')
-        plt.ylabel('Counts')
-        plt.title("{} order spectral light curve []".format(order))
-
-        if save_plot:
-            plot_dir = os.path.join(output_dir, 'plots') 
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir) 
-            filedir = os.path.join(plot_dir, f'{filename}_lc{i}.png')
-            #plt.savefig(filedir,dpi=300,bbox_inches='tight')
-
-        if show_plot:
-            plt.show(block=True)
-
-        plt.close() # save memory
-
-    return 
-
-def plot_waterfall(light_curves, order, show_plot=False, save_plot=False,
-                   filename=None, output_dir = None):
-    """_summary_
-
-    Args:
-        light_curves (_type_): _description_
-        order (_type_): _description_
-        show_plot (bool, optional): _description_. Defaults to False.
-        save_plot (bool, optional): _description_. Defaults to False.
-        filename (_type_, optional): _description_. Defaults to None.
-        output_dir (_type_, optional): _description_. Defaults to None.
-    """
-
-    # import data
-    exp_time = light_curves.exp_time.data
-    wave_cents = light_curves.wave_cents.data
-    wave_edges = light_curves.wave_edges.data
-    lcs_raw = light_curves.spec_lc.data
-    
-    # define colors and offsets
-    colors = pl.cm.jet(np.linspace(0, 1, len(wave_cents)))
-    offset = -0.02 # find a way to calculate this automatically
-
-    # get index cut
-    half_ind = int(np.shape(lcs_raw)[0]/2)
-  
-    # create figure
-    plt.figure(figsize = (8, 35))
-    plt.title(f'Raw binned light curves order {order}')
-    ax1 = plt.subplot2grid((1, 2), (0, 0))
-
-    for i, lc in enumerate(lcs_raw[:half_ind]):
-
-        ax1.plot(exp_time, lc/np.mean(lc) + i*offset, 
-                 '--', color = colors[i], markersize=3, linewidth=1)
-        
-        ax1.plot(exp_time, lc/np.mean(lc) + i*offset, 
-                 'o', color = colors[i], markersize=3, markeredgecolor = 'black', markeredgewidth = 0.5)
-        
-        ax1.text(exp_time[0], 1 + i*offset - offset/2, 
-                 '[{:.0f}, {:.0f}] $\AA$'.format(wave_edges[i], wave_edges[i+1]), 
-                 color = colors[i], 
-                 fontsize = 8, 
-                 fontweight='bold')
-
-         
-    ax1.set_ylabel('Normalized Flux')
-    ax1.set_xlabel('Time from Mid-transit (days)')
-    #ax1.set_ylim(ylims)
-
-    ax2 = plt.subplot2grid((1, 2), (0, 1), sharey = None, sharex = ax1)
-
-    for i, lc in enumerate(lcs_raw[half_ind:]):
-
-        ax2.plot(exp_time, lc/np.mean(lc) + i*offset, 
-                 '--', color = colors[half_ind + i], markersize=3, linewidth=1)
-        
-        ax2.plot(exp_time, lc/np.mean(lc) + i*offset, 
-                 'o', color = colors[half_ind + i], markersize=3, markeredgecolor = 'black', markeredgewidth = 0.5)
-        
-        ax2.text(exp_time[0], 1 + i*offset - offset/2, 
-                 '[{:.0f}, {:.0f}] $\AA$'.format(wave_edges[half_ind + i], wave_edges[half_ind + i + 1]), 
-                 color = colors[half_ind + i], 
-                 fontsize = 8, 
-                 fontweight='bold')
-     
-    plt.subplots_adjust(wspace=0.05, hspace=0.1)
-
-    ax2.set_xlabel('Time from Mid-transit (days)')
-    ax2.set_yticks([])
-
-
-    if save_plot:
-        plot_dir = os.path.join(output_dir, 'plots') 
-        if not os.path.exists(plot_dir):
-            os.makedirs(plot_dir) 
-        filedir = os.path.join(plot_dir, f'{filename}_order{order}.png')
-        plt.savefig(filedir, dpi=300, bbox_inches='tight')
-
-    if show_plot:
-        plt.show(block=True)
-
-    plt.close() # save memory
-
-
-    return 
-

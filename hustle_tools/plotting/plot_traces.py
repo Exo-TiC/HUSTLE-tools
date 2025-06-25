@@ -40,9 +40,9 @@ def plot_profile_fit(y_vals, profile, gaussian_fit, cal_center, fit_center,
     plt.axvline(fit_center - 12, linestyle = '--', color = 'gray', linewidth = 0.7)
     plt.axvline(fit_center + 12, linestyle = '--', color = 'gray', linewidth = 0.7)
     plt.axvline(cal_center, color = 'black', linestyle = '-.', alpha = 0.8)
-    plt.ylabel('Counts')
-    plt.xlabel('Detector Pixel Position')
-    plt.title(f'Example of Profile fitted to Trace Column {column}')
+    plt.ylabel('Counts (counts)')
+    plt.xlabel('Detector Pixel Position (pixel)')
+    plt.title(f'Example Of Profile Fitted To Trace Column {column}')
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -88,9 +88,9 @@ def plot_fitted_positions(trace_x, trace_y, trace, exp_num, fitted_trace = None,
     if fitted_trace is not None:
         plt.plot(trace_x, fitted_trace, '-', color='black', label='Polynomial fit to centers')
 
-    plt.xlabel('X pixel position')
-    plt.ylabel('Y pixel position')
-    plt.title(f'Trace positions Exposure {exp_num}')
+    plt.xlabel('X-Pixel position (pixels)')
+    plt.ylabel('Y-Pixel position (pixels)')
+    plt.title(f'Trace Positions, Exposure #{exp_num}')
     plt.legend()
 
     if save_plot:

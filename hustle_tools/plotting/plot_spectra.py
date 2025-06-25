@@ -2,6 +2,8 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.pylab as pl
 from matplotlib.animation import FuncAnimation
 
 
@@ -44,9 +46,9 @@ def plot_one_spectrum(wavelengths, spectrum, order="+1",
     # initialize plot and plot data that's in the okay range
     plt.figure(figsize = (10, 7))
     plt.plot(wavelengths[ok], spectrum[ok], color=colors[order])
-    plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Extracted Counts')
-    plt.title('Example of extracted order {} spectrum'.format(order))
+    plt.xlabel(r'Wavelength ($\AA$)')
+    plt.ylabel('Extracted Counts (counts)')
+    plt.title('Example Of Extracted Order {} Spectrum'.format(order))
     
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
@@ -61,6 +63,54 @@ def plot_one_spectrum(wavelengths, spectrum, order="+1",
     plt.close() # save memory
 
     return 
+
+
+def plot_spec_stack(wav, spec, order="+1",
+                    show_plot = False, save_plot = False,
+                    filename = None, output_dir = None):
+    """Function to plot all extracted spectrum over top themselves.
+
+    Args:
+        wav (np.array): wavelength solution for given orders.
+        spec (np.array): 1D extracted spectra.
+        order (str, optional): which order we are plotting, for plot title.
+        Defaults to "+1".
+        show_plot (bool, optional): whether to interrupt execution to
+        show the user the plot. Defaults to False.
+        save_plot (bool, optional): whether to save this plot to a file.
+        Defaults to False.
+        filename (str, optional): name to give this file, if saving.
+        Defaults to None.
+        output_dir (str, optional): where to save the file, if saving.
+        Defaults to None.
+    """
+    # define colors
+    colors = pl.cm.viridis(np.linspace(0, 1, spec.shape[0]))
+
+    # bound wavelengths to the region G280 is sensitive to
+    ok = (wavelengths>2000) & (wavelengths<8000)
+
+    # initialize plot and plot data that's in the okay range
+    plt.figure(figsize = (10, 7))
+    for i, color in enumerate(colors):
+        plt.plot(wav[ok],spec[i,ok],color = colors[i],alpha=0.25)
+    plt.xlabel(r'Wavelength ($\AA$)')
+    plt.ylabel('Extracted Counts (counts)')
+    plt.title('All extracted order {} spectra'.format(order))
+    
+    if save_plot:
+        plot_dir = os.path.join(output_dir, 'plots') 
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir) 
+        filedir = os.path.join(plot_dir, f'{filename}.png')
+        plt.savefig(filedir,dpi=300,bbox_inches='tight')
+
+    if show_plot:
+        plt.show(block=True)
+
+    plt.close() # save memory
+
+    return
 
 
 def plot_spec_gif(wav, spec, order="+1",
@@ -100,8 +150,8 @@ def plot_spec_gif(wav, spec, order="+1",
     leg = ax.legend(loc='upper right')
     ax.set_xlim(2000,8000)
     ax.set_ylim(0, np.nanmax(spec[:,ok]))
-    ax.set_xlabel('wavelength [AA]')
-    ax.set_ylabel('counts [a.u.]')
+    ax.set_xlabel(r'Wavelength ($\AA$)')
+    ax.set_ylabel('Counts (counts)')
 
     # initialize 
     def init():
@@ -160,8 +210,8 @@ def plot_2d_spectra(wav, spec, order="+1",
         Defaults to None.
     """
     
-    # normalize spectra
-    n_oot = int(0.20*spec.shape[0]) # typically, first 20% of data is the first orbit, which is oot/ooe
+    # normalize spectra using median of first 20% of data, which is typically oot/ooe
+    n_oot = int(0.20*spec.shape[0])
     spec = spec / np.nanmedian(spec[:n_oot], axis=0)
 
     plt.figure(figsize = (10, 7))
@@ -169,9 +219,9 @@ def plot_2d_spectra(wav, spec, order="+1",
                vmin = 0.99, vmax = 1.01, cmap='copper',
                extent = [wav[0], wav[-1], 0, spec.shape[0]])
     plt.colorbar()
-    plt.ylabel('Integration number')
-    plt.xlabel('Wavelength (microns)')
-    plt.title(f'2D spectral map Order {order}')
+    plt.ylabel('Integration (#)')
+    plt.xlabel(r'Wavelength ($\AA$)')
+    plt.title(f'2D Spectral Map, order {order}')
 
     if save_plot:
         plot_dir = os.path.join(output_dir, 'plots') 
