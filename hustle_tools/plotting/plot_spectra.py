@@ -238,7 +238,6 @@ def plot_2d_spectra(wav, spec, order="+1",
     return 
 
 
-
 def plot_best_aperture(tested_hws, reses,  
                        show_plot = False, save_plot = False,
                         filename = None, output_dir = None):
@@ -262,7 +261,7 @@ def plot_best_aperture(tested_hws, reses,
     plt.scatter(tested_hws, [1e6*i for i in reses], color='indianred')
     plt.axvline(tested_hws[np.argmin(reses)], color='gray', 
                 linestyle='--', label='Lowest rms aperture')
-    plt.xlabel('Half-width [pixels]')
+    plt.xlabel('Half-width (pixels)')
     plt.ylabel('Residuals (ppm)')
     plt.legend()
 

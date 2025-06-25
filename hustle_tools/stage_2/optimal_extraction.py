@@ -9,6 +9,7 @@ from scipy.signal import medfilt
 from hustle_tools.plotting import plot_exposure
 from hustle_tools.stage_2 import standard_extraction
 
+
 def spatial_profile_smooth(image_org, kernel = 11, threshold = 5., std_window = 20, 
                            median_window = 7, show_plots=0, save_plots=0, output_dir=0):
     """Builds a spatial profile using 1D smoothing.
@@ -247,7 +248,7 @@ def spatial_profile(exp_ind, image_org, window = 40, threshold = 4., normalize =
     
     # if true, plot spatial profile
     if (show_plots==2) or (save_plots==2):
-        plot_exposure([P_prof], title = f'Example of Spatial profile Exposure {exp_ind}', min=1e-4, max=1e0,
+        plot_exposure([P_prof], title = f'Example of Spatial Profile, Exposure #{exp_ind}', min=1e-4, max=1e0,
                       show_plot=(show_plots==2), save_plot=(save_plots==2),
                       output_dir=output_dir, filename = [f'spatial_profile_exp{exp_ind}'])
         
@@ -270,7 +271,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
         low_val (_type_): _description_
         up_val (_type_): _description_
         init_spec (_type_, optional): _description_. Defaults to None.
-        fit_thresh (_type_, optional): _description_. Defaults to 4..
+        fit_thresh (float, optional): _description_. Defaults to 4..
         fit_degree (int, optional): _description_. Defaults to 5.
         window (int, optional): _description_. Defaults to 50.
         correct_thresh (_type_, optional): _description_. Defaults to None.
@@ -282,7 +283,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
         is greater than 0. Defaults to None.
 
     Returns:
-        _type_: _description_
+        array-like: the spatial profile for optimal extraction.
     """
 
     # copy image data and extract y values

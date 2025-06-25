@@ -36,8 +36,8 @@ def plot_0th_histogram(hist_vals, bin_cents, gaussian_fit, fit_value,
     plt.plot(bin_cents, gaussian_fit, color='gray')
     plt.axvline(np.median(hist_vals), color= 'indianred')
     plt.axvline(fit_value, color= 'gray')
-    plt.xlabel('Photons')
-    plt.ylabel('Counts')
+    plt.xlabel('Pixel Value (counts)')
+    plt.ylabel('Counts (#)')
 
     if save_plot:
         plot_dir = os.path.join(output_dir,'plots')

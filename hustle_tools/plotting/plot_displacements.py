@@ -139,7 +139,7 @@ def plot_0th_order(exp_time, xs, ys,
     return 
 
 
-def plot_shifts_cc(exp_time, shifts, ylabel = 'X shift',
+def plot_shifts_cc(exp_time, shifts, ylabel = 'X shift (pixels)',
                    show_plot = False, save_plot = False, 
                    filename = None, output_dir = None):
     """Plots the dispersion or cross-dispersion 
@@ -148,7 +148,7 @@ def plot_shifts_cc(exp_time, shifts, ylabel = 'X shift',
     Args:
         exp_time (np.array): exposure times for each frame.
         x_shifts (np.array): shifts calculated via cross-correlation
-        ylabel (str, optional): y-axis label. Defaults to 'X shift'.
+        ylabel (str, optional): y-axis label. Defaults to 'X shift (pixels)'.
         show_plot (bool, optional): whether to interrupt execution to
         show the user the plot. Defaults to False.
         save_plot (bool, optional): whether to save this plot to a file.
@@ -161,7 +161,7 @@ def plot_shifts_cc(exp_time, shifts, ylabel = 'X shift',
 
     plt.figure(figsize = (10, 7))
     plt.plot(exp_time, shifts, '-o', color='indianred')
-    plt.xlabel('Time of exposure')
+    plt.xlabel('Time Of Exposure (MJD)')
     plt.ylabel(ylabel)
    
     if save_plot:

@@ -20,14 +20,14 @@ def Gauss1D(x, A, x0, sigma):
     """Creates a 1D Gaussian on the given x range.
 
     Args:
-        x (np.array): independent variable in the Gaussian.
+        x (array-like): independent variable in the Gaussian.
         H (float): vertical offset.
         A (float): amplitude of the Gaussian.
         x0 (float): center of the Gaussian.
         sigma (float): width of the Gaussian.
 
     Returns:
-        np.array: Gaussian profile on domain x.
+        array-like: Gaussian profile on domain x.
     """
     return A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
 
@@ -36,14 +36,14 @@ def exponential(x, x0, y0, a, b):
     """Creates a 1D exponential on a given x range.
 
     Args:
-        x (np.array): independent variable in the Gaussian.
+        x (array-like): independent variable in the Gaussian.
         x0 (float): normalisation of independent variable.
         y0 (float): constant offset of the exp.
         a (float): amplitude of the exponential.
         b (float): power of the exponential.
 
     Returns:
-        p.array: 1D exponential on domain x.
+        array-like: 1D exponential on domain x.
     """
     return y0 + a * np.exp(b * (x - x0)) 
 

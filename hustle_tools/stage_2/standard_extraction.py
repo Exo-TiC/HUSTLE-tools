@@ -17,8 +17,8 @@ def standard_extraction(obs, halfwidth, trace_x, trace_y, order='+1', masks = []
         obs (xarray): obs.images contains the data.
         halfwidth (int): "halfwidth" of the extraction aperture, which spans
         from A-hw to A+hw where A is the index of the central row.
-        trace_x (np.array): x positions of the pixels in the trace solution.
-        trace_y (np.array): y positions of the pixels in the trace solution.
+        trace_x (array-like): x positions of the pixels in the trace solution.
+        trace_y (array-like): y positions of the pixels in the trace solution.
         order (str): for labelling plots correctly.
         masks (list): x, y, radii of objects in the aperture you want to mask.
         verbose (int, optional): How detailed you want the printed statements
@@ -29,7 +29,7 @@ def standard_extraction(obs, halfwidth, trace_x, trace_y, order='+1', masks = []
         is greater than 0. Defaults to None.
 
     Returns:
-        np.array,np.array: 1D spectrum and errors.
+        array-like, array-like: 1D spectrum and errors.
     """
     # Define traces array.
     traces = []
@@ -96,14 +96,14 @@ def get_trace(frame, halfwidth, xs, ys):
     solution and halfwidth.
 
     Args:
-        frame (np.array): one frame from obs.images Dataset.
+        frame (array-like): one frame from obs.images Dataset.
         halfwidth (int): halfwidth of extraction. Pulls pixels from A-hw to
         A+hw where A is the central row index.
-        xs (np.array): x positions of the pixels in the trace solution.
-        ys (np.array): y positions of the pixels in the trace solution.
+        xs (array-like): x positions of the pixels in the trace solution.
+        ys (array-like): y positions of the pixels in the trace solution.
 
     Returns:
-        np.array: dispersion profiles from the trace.
+        array-like: dispersion profiles from the trace.
     """
     dispersion_profiles = []
     for i,x in enumerate(xs):
@@ -119,10 +119,10 @@ def box(trace):
     columns without any weighting.
 
     Args:
-        trace (np.array): one frame in time showing the trace at integration k.
+        trace (array-like): one frame in time showing the trace at integration k.
 
     Returns:
-        np.array: 1D array of the unweighted spectrum from that trace.
+        array-like: 1D array of the unweighted spectrum from that trace.
     """
     return np.nansum(trace,axis=1)
 
@@ -135,9 +135,9 @@ def determine_ideal_halfwidth(obs, order, trace_x, trace_y, wavs, indices=([0,10
     Args:
         obs (xarray): obs.images DataSet contains the images.
         order (str): used to label plots appropriately.
-        trace_x (np.array): x positions of the pixels in the trace solutions.
-        trace_y (np.array): y positions of the pixels in the trace solutions.
-        wavs (np.array): wavelength solution for each image.
+        trace_x (array-like): x positions of the pixels in the trace solutions.
+        trace_y (array-like): y positions of the pixels in the trace solutions.
+        wavs (array-like): wavelength solution for each image.
         indices (tuple, optional): indices that define the out-of-transit/eclipse
         flux, for which scatter is measured. Defaults to ([0,10],[-10,-1]).
         verbose (int, optional): How detailed you want the printed statements
@@ -194,13 +194,13 @@ def est_errs(time, flx, kick_outliers=True):
     out-of-transit/eclipse flux.
 
     Args:
-        time (np.array): timestamps for exposures.
-        flx (np.array): oot/ooe flux.
+        time (array-like): timestamps for exposures.
+        flx (array-like): oot/ooe flux.
         kick_outliers (bool, optional): Whether to remove outliers like CRs
         from the array to get more accurate scatter estimation. Defaults to True.
 
     Returns:
-        np.array: residuals from the rampslope fit to the oot/ooe flux.
+        array-like: residuals from the rampslope fit to the oot/ooe flux.
     """
     result = least_squares(residuals_,
                            np.array([1,1,0,1]),
@@ -213,14 +213,14 @@ def residuals_(fit,x,flx,kick_outliers=False):
     """Residuals function for fitting a ramp-slope time-series to oot/ooe flux.
 
     Args:
-        fit (np.array): guess of parameters for the fit.
-        x (np.array): time.
-        flx (np.array): flux.
+        fit (array-like): guess of parameters for the fit.
+        x (array-like): time.
+        flx (array-like): flux.
         kick_outliers (bool, optional):Whether to remove outliers like CRs
         from the array to get more accurate scatter estimation. Defaults to True.
 
     Returns:
-         np.array: residuals of the fit.
+         array-like: residuals of the fit.
     """
     rs = rampslope(x,fit[0],fit[1],fit[2],fit[3])
     residuals = flx-rs
@@ -237,14 +237,14 @@ def rampslope(x,a,b,c,d):
     """A exp(b t) + c t + d trend.
 
     Args:
-        x (np.array): time.
+        x (array-like): time.
         a (float): amplitude of the exponential.
         b (float): "slope" of the exponential.
         c (float): linear trend slope.
         d (float): linear trend intercept.
 
     Returns:
-        np.array: ramp-slope trend.
+        array-like: ramp-slope trend.
     """
     return a*np.exp(b*(x-np.nanmean(x))) + c*(x-np.nanmean(x)) + d
 
