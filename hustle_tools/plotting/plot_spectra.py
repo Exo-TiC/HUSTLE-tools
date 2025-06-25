@@ -192,12 +192,26 @@ def plot_2d_spectra(wav, spec, order="+1",
 def plot_best_aperture(tested_hws, reses,  
                        show_plot = False, save_plot = False,
                         filename = None, output_dir = None):
+    """Plots the light curve scatter as a function of the extraction half-width aperture
 
+    Args:
+        tested_hws (np.array): half-width apertures tested
+        reses (np.array): residuals for each half-width aperture
+        show_plot (bool, optional): whether to save this plot to a file.
+        Defaults to False.
+        save_plot (bool, optional): whether to save this plot to a file.
+        Defaults to False.
+        filename (str, optional): name to give this file, if saving.
+        Defaults to None.
+        output_dir (str, optional): where to save the file, if saving.
+        Defaults to None.
+    """
 
     # plot rms of each aperture
     plt.figure(figsize=(10, 7))
     plt.scatter(tested_hws, [1e6*i for i in reses], color='indianred')
-    plt.axvline(tested_hws[np.argmin(reses)], color='gray', linestyle='--', label='Lowest rms aperture')
+    plt.axvline(tested_hws[np.argmin(reses)], color='gray', 
+                linestyle='--', label='Lowest rms aperture')
     plt.xlabel('Half-width [pixels]')
     plt.ylabel('Residuals (ppm)')
     plt.legend()
