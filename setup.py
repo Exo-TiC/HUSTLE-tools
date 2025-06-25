@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='hustle-tools',
-    version='0.0.1',
+    version='0.3',
     author='Abby Boehm and Carlos Gascon',
     url='https://github.com/Exo-TiC/HUSTLE-tools',
     license='MIT',
