@@ -88,7 +88,7 @@ def plot_spec_stack(wav, spec, order="+1",
     colors = pl.cm.viridis(np.linspace(0, 1, spec.shape[0]))
 
     # bound wavelengths to the region G280 is sensitive to
-    ok = (wavelengths>2000) & (wavelengths<8000)
+    ok = (wav>2000) & (wav<8000)
 
     # initialize plot and plot data that's in the okay range
     plt.figure(figsize = (10, 7))
