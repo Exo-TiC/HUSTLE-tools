@@ -125,13 +125,13 @@ def parse_xarr(obs,
     return images, dq, exp_times, total_flux, partial_flux, section
 
 
-def create_gif(exp_times, images, total_flux, partial_flux, section,
+def create_gif(exp_times, org_images, total_flux, partial_flux, section,
                output_dir, show_fig = False, save_fig = False):
     """Function to create an animation showing all the exposures.
 
     Args:
         exp_times (array-like): exposure times for each image.
-        images (array-like): array of 2D images to pull a light curve from.
+        org_images (array-like): array of 2D images to pull a light curve from.
         total_flux (array-like): flux summed across each 2D image.
         partial_flux (array-like): flux summed from the section of each 2D image.
         section (lst of int): the subsection of image you measured flux in.
@@ -143,6 +143,7 @@ def create_gif(exp_times, images, total_flux, partial_flux, section,
     """
 
     # avoid zero and negative values for log plot
+    images = org_images.copy()
     images[images <= 0] = 1e-7
 
     # create animation
