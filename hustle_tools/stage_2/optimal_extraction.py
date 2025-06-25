@@ -7,6 +7,7 @@ from scipy import interpolate
 from scipy.signal import medfilt
 
 from hustle_tools.plotting import plot_exposure
+from hustle_tools.stage_2.standard_extraction import create_circular_mask
 from hustle_tools.stage_2 import standard_extraction
 
 
@@ -435,7 +436,8 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
     return spatial_prof
 
 
-def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_type = 'polyfit', 
+def optimal_extraction(obs, trace_x, traces_y, masks = [],
+                       width = 25, thresh = 17., prof_type = 'polyfit', 
                        iterate = False, zero_bkg = None,
                        verbose=0, show_plots=0, save_plots=0, output_dir=None):
     """Performs an optimal extraction with a spatial profile of choice following
@@ -445,6 +447,8 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
         obs (xarray): dataset from which we will extract the 1D spectra.
         trace_x (array-like): x column solutions of the trace to extract.
         traces_y (arary-like): y row solutions of the trace to extract.
+        masks (list, optional): x, y, radii of objects in the aperture you
+        want to mask. Defaults to [].
         width (int, optional): aperture halfwidth for extraction. For optimal,
         ideally use a very large window since the weighting will take care of
         the rest. Defaults to 25.
@@ -471,6 +475,21 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
     opt_specs, opt_specs_err = [], []
     images = obs.images.data.copy()
     errors = obs.errors.data.copy()
+
+    # mask objects if asked
+    if masks != None:
+        for k in range(images.shape[0]):
+            frame = images[k,:,:]
+            err = errors[k,:,:]
+            for mask in masks:
+                # Build a circle mask on top of the object.
+                obj_mask = create_circular_mask(frame.shape[0], frame.shape[1],
+                                                center=[mask[0],mask[1]], radius=mask[2])
+                # 0 out that data.
+                frame[obj_mask] = 0
+                err[obj_mask] = 0
+            images[k,:,:] = frame  
+            errors[k,:,:] = err
 
     # Define subarray for extraction
     margin = 5

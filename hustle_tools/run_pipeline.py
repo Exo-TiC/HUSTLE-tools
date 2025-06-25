@@ -373,6 +373,7 @@ def run_pipeline(config_files_dir, stages=(0, 1, 2, 3, 4, 5)):
                 spec, spec_err = optimal_extraction(obs, 
                                                     trace_x, 
                                                     trace_y,
+                                                    masks=stage2_dict['mask_objs'],
                                                     width = stage2_dict['halfwidths_opt'][i],
                                                     prof_type = stage2_dict['aperture_type'],
                                                     show_plots=stage2_dict['show_plots'],
