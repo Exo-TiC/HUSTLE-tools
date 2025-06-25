@@ -64,7 +64,7 @@ Each run for each stage is defined through a ".hustle" configuration file, where
 
 Included tutorials and example scripts ensure HUSTLE-tools can be run with minimal prior experience in pipeline development and operation. The modular and user-friendly design of HUSTLE-tools permits users to fine-tune their reduction to obtain optimal results. Users can toggle and tweak their desired processes within each stage and can easily rerun stages to explore different reduction techniques.
 
-HUSTLE-tools is built from the 'Hazelnut' pipeline presented in @Boehm2024 and the 'lluvia' pipeline presented in @Gascón2025. 
+HUSTLE-tools is built from the 'Hazelnut' pipeline presented in @Boehm2024 and the 'lluvia' pipeline presented in @Gascon2025. 
 
 # Acknowledgments
 We acknowledge contributions from the full HUSTLE team, and specifically testing by Ailsa Campbell. 
