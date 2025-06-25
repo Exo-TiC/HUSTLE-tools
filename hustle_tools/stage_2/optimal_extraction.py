@@ -9,14 +9,6 @@ from scipy.signal import medfilt
 from hustle_tools.plotting import plot_exposure
 from hustle_tools.stage_2 import standard_extraction
 
-
-def spatial_profile_curved():
-    return 0
-
-def spatial_profile_curved_poly():
-    return 0
-
-
 def spatial_profile_smooth(image_org, kernel = 11, threshold = 5., std_window = 20, 
                            median_window = 7, show_plots=0, save_plots=0, output_dir=0):
     """Builds a spatial profile using 1D smoothing.
@@ -367,7 +359,7 @@ def spatial_profile_curved_poly(exp_ind, sub_image_org, image, tx_main, ty_main,
 
         # create window profile
         curve_image_copy = curve_image.copy()
-        P_win, xhit, yhit, stds_win = window_profile(curve_image_copy, init_pix, fin_pix, threshold = fit_thresh, pol_degree = fit_degree) # curve image is being modified here
+        P_win, xhit, yhit, stds_win = window_profile(curve_image_copy, init_pix, fin_pix, threshold = fit_thresh, pol_degree = fit_degree)
 
         # normalize
         P_prof[:, init_pix:fin_pix] = P_win
@@ -528,11 +520,6 @@ def optimal_extraction(obs, trace_x, traces_y, width = 25, thresh = 17., prof_ty
             image = images[i]
             prof = spatial_profile_curved_poly(i, sub_image, image, trace_x, trace_y, low_val, up_val, init_spec = None, correct_thresh=7., window = 40,
                                                show_plots = show_plots, save_plots=save_plots, output_dir=output_dir)
-        
-        elif prof_type == 'curved_smooth':
-            image = images[i]
-            prof = spatial_profile_curved(i, sub_image, image, trace_x, trace_y, low_val, up_val, init_spec = spectrum, correct_thresh = 6., smooth_window = 7, median_window = 7,
-                                          show_plots = show_plots, save_plots=save_plots, output_dir=output_dir)
         
         if (show_plots==1 or save_plots==1) and (i == 0):
             plot_exposure([prof], title = f'Example of Spatial profile Exposure {i}', min=1e-4, max=1e0,

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy import signal
 
+from hustle_tools.plotting import plot_shifts_cc
+
 
 def cross_corr(spec, temp_spec, order='+1', i=0, trim = 1, fit_window = 5, subpix_width = 0.01,
                show_plots = 0, save_plots = 0, output_dir = None):
@@ -65,25 +67,6 @@ def cross_corr(spec, temp_spec, order='+1', i=0, trim = 1, fit_window = 5, subpi
 
     parab_vtx = -p_coeffs[1] / (2 * p_coeffs[0]) * subpix_width
     
-    if (show_plots == 2 or save_plots == 2):
-        plt.figure()
-        plt.plot(corr_lags, corr)
-
-        plt.figure()
-        plt.plot(cent_lags, cent_corr)
-        plt.plot(cent_lags, p_val)
-
-        if save_plots == 2:
-            plot_dir = os.path.join(output_dir, "plots")
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir)
-            plt.savefig(os.path.join(plot_dir,'cross_corr_order{}_f{}.png'.format(order,i)),
-                        dpi=300,bbox_inches='tight')
-        if show_plots == 2:
-            plt.show(block=True)
-        plt.close()
-        plt.close() # save memory
-
     return parab_vtx + trim
 
 
@@ -114,11 +97,11 @@ def align_spectra(obs, specs, specs_err, order, trace_x, align = False,
     align_specs = []
     align_specs_err = []
     x_shifts = []
+
     # align only on the intended wavelengths of analysis
     ok = (trace_x>2000) & (trace_x<8000)
     temp_spec = np.median(specs[:,ok], axis = 0)
 
-    
     # iterate over all spectra
     for i, spec in tqdm(enumerate(specs),
                         desc='Aligning spectra in order {}... Progress:'.format(order),
@@ -148,6 +131,12 @@ def align_spectra(obs, specs, specs_err, order, trace_x, align = False,
 
 
     if (save_plots > 0 or show_plots > 0):
+        
+        plot_shifts_cc(obs.exp_time.data, x_shifts, ylabel='X shift',
+                        show_plot = (show_plots > 0), save_plot = (save_plots > 0), 
+                        filename = 'xshifts_cc_order{}.png'.format(order), output_dir = output_dir)
+
+        '''
         plt.figure(figsize = (10, 7))
         plt.plot(obs.exp_time.data, x_shifts, '-o', color='indianred')
         plt.xlabel('Exposure time')
@@ -163,31 +152,8 @@ def align_spectra(obs, specs, specs_err, order, trace_x, align = False,
             plt.show(block=True)
         
         plt.close() # save memory
-
         '''
-        colors = plt.cm.rainbow(np.linspace(0, 1, 25))
 
-        plt.figure(figsize = (10, 7))
-        for i, spec in enumerate(specs[0:25]):
-            plt.plot(spec, color = colors[i])
-
-        plt.figure(figsize = (10, 7))
-        for i, spec in enumerate(align_specs[0:25]):
-            plt.plot(spec, color = colors[i])
-
-        if save_plots > 0:
-            plot_dir = os.path.join(output_dir, "plots")
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir)
-            plt.savefig(os.path.join(plot_dir,'shifted_spec_order{}.png'.format(order)),
-                        dpi=300,bbox_inches='tight')
-        if show_plots > 0:
-            plt.show(block=True)
-
-        plt.close() # save memory
-        plt.close() # save memory
-        '''
-    
     return align_specs, align_specs_err, np.array(x_shifts)
 
 
@@ -247,21 +213,9 @@ def align_profiles(obs, trace_x, traces_y, order, width = 25,
     y_shifts = np.array(y_shifts).transpose()
 
     if show_plots>0 or save_plots>0:
-        plt.figure(figsize = (10, 7))
-        plt.plot(exp_times, np.median(y_shifts, axis = 1), '-o', color='indianred')
-        plt.xlabel('Exposure time')
-        plt.ylabel('Y displacement')
+        plot_shifts_cc(obs.exp_time.data, np.median(y_shifts, axis = 1), ylabel='Y shift',
+                    show_plot = (show_plots > 0), save_plot = (save_plots > 0), 
+                    filename = 'yshifts_cc_order{}.png'.format(order), output_dir = output_dir)
 
-        if save_plots>0:
-            plot_dir = os.path.join(output_dir, 'plots')
-            if not os.path.exists(plot_dir):
-                os.makedirs(plot_dir) 
-            filedir = os.path.join(plot_dir, 'trace_crossdisp_profiles_order{}.png'.format(order))
-            plt.savefig(filedir, bbox_inches = 'tight', dpi = 300)
-        
-        if show_plots>0:
-            plt.show(block=True)
-
-        plt.close() # save memory
-        
+             
     return y_shifts
