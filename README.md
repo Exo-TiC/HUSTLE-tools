@@ -1,6 +1,8 @@
 # HUSTLE-tools
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15041300.svg)](https://doi.org/10.5281/zenodo.15041300)
 
+v1.0.0: Official release version of HUSTLE-tools for JOSS publication.
+
 v0.2: Re-branded release of the HUSTLE-tools pipeline with updated tutorials and commands.
 
 V0.1: First release of the HUSTLE-tools pipeline (previously ExoTiC-UVIS) to download, sort, and analyse Hubble WFC3/UVIS G280 spectra.
